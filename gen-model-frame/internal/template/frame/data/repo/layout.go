@@ -8,28 +8,28 @@ import (
 
         "github.com/mitchellh/mapstructure"
         "github.com/pkg/errors"
-        model "{{ModelGoPackagePath}}"
+        model "{{.ModelGoPackagePath}}"
         "gitlab.innovationup.stream/innovation-upstream/api-frame/service/data/storage"
         "gitlab.innovationup.stream/innovation-upstream/api-frame/service/data/storage/field"
         "gitlab.innovationup.stream/innovation-upstream/api-frame/service/data/storage/query"
 )
 
-const {{ModCamel}}Collection = "{{ModSnake}}"
+const {{.Basic.ModCamel}}Collection = "{{.Basic.ModSnake}}"
 
-//go:generate mockgen -destination=../mock/{{ModSnake}}_repo_mock.go -package=mock {{ModGoPackage}} {{ModCamel}}Repo
-type {{ModCamel}}Repo interface {
-  {{"{{"}}InterfaceDefinition{{"}}"}}
+//go:generate mockgen -destination=../mock/{{.Basic.ModSnake}}_repo_mock.go -package=mock {{.ModGoPackage}} {{.Basic.ModCamel}}Repo
+type {{.Basic.ModCamel}}Repo interface {
+  {{.InterfaceDefinition}}
 }
 
-type {{ModLowerCamel}}Repo struct {
+type {{.Basic.ModLowerCamel}}Repo struct {
   storage storage.Storage
 }
 
-func New{{ModCamel}}Repo(s storage.Storage) {{ModCamel}}Repo {
-  return &{{ModLowerCamel}}Repo{
+func New{{.Basic.ModCamel}}Repo(s storage.Storage) {{.Basic.ModCamel}}Repo {
+  return &{{.Basic.ModLowerCamel}}Repo{
     storage: s,
   }
 }
 
-{{"{{"}}Methods{{"}}"}}
+{{.Methods}}
 `

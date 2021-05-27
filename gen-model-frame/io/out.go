@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/pkg/errors"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/model"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/model/model_gen"
+	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/generator"
+	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model"
 )
 
 type (
@@ -26,7 +26,7 @@ func NewModelOut(model model.Model) ModelOut {
 
 func (o *modelOut) OutputGenerated() error {
 	// TODO: if golang
-	goGen := model_gen.NewGolangModelGenerator()
+	goGen := generator.NewGolangModelGenerator()
 	out, err := goGen.Generate(o.Model)
 	if err != nil {
 		return errors.WithStack(err)

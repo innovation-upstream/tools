@@ -1,8 +1,8 @@
 package template
 
 import (
-	repoTemplate "gitlab.innovationup.stream/innovation-upstream/gen-model-frame/model/generator/template/frame/data/repo"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/model/model_function"
+	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model_frame_path"
+	repoTemplate "gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/template/frame/data/repo"
 )
 
 type (
@@ -16,7 +16,7 @@ const TemplateSectionInterface = TemplateSection("interface")
 const TemplateSectionMethod = TemplateSection("method")
 
 type TemplateRegistry interface {
-	GetTemplatesForModelFrameLayer(layer model_function.ModelFrameLayerType) (templatesForLayer, string)
+	GetTemplatesForModelFrameLayer(layer model_frame_path.ModelFrameLayerType) (templatesForLayer, string)
 }
 
 type templatesForLayer struct {
@@ -24,16 +24,16 @@ type templatesForLayer struct {
 }
 
 type templatesForFunctionType struct {
-	LayerTemplates map[model_function.ModelFrameLayerType]templatesForLayer
+	LayerTemplates map[model_frame_path.ModelFrameLayerType]templatesForLayer
 }
 
 type golangTemplateRegistry struct {
-	FunctionTemplates map[model_function.ModelFunctionType]templatesForFunctionType
-	LayoutTemplates   map[model_function.ModelFrameLayerType]string
-	ModelFramePath    model_function.ModelFramePath
+	FunctionTemplates map[model_frame_path.ModelFunctionType]templatesForFunctionType
+	LayoutTemplates   map[model_frame_path.ModelFrameLayerType]string
+	ModelFramePath    model_frame_path.ModelFramePath
 }
 
-func NewGolangTemplateRegistry(modelFramePath model_function.ModelFramePath) TemplateRegistry {
+func NewGolangTemplateRegistry(modelFramePath model_frame_path.ModelFramePath) TemplateRegistry {
 	dataRepoCreateSectionTmpl := templatesForLayer{
 		SectionTemplates: map[TemplateSection]string{
 			TemplateSectionInterface: repoTemplate.InterfaceRepoCreate,
@@ -42,8 +42,8 @@ func NewGolangTemplateRegistry(modelFramePath model_function.ModelFramePath) Tem
 	}
 
 	createLayerTmpl := templatesForFunctionType{
-		LayerTemplates: map[model_function.ModelFrameLayerType]templatesForLayer{
-			model_function.ModelFrameLayerTypeDataRepo: dataRepoCreateSectionTmpl,
+		LayerTemplates: map[model_frame_path.ModelFrameLayerType]templatesForLayer{
+			model_frame_path.ModelFrameLayerTypeDataRepo: dataRepoCreateSectionTmpl,
 		},
 	}
 
@@ -74,16 +74,16 @@ func NewGolangTemplateRegistry(modelFramePath model_function.ModelFramePath) Tem
 	*/
 
 	return &golangTemplateRegistry{
-		FunctionTemplates: map[model_function.ModelFunctionType]templatesForFunctionType{
-			model_function.ModelFunctionTypeCreate: createLayerTmpl,
+		FunctionTemplates: map[model_frame_path.ModelFunctionType]templatesForFunctionType{
+			model_frame_path.ModelFunctionTypeCreate: createLayerTmpl,
 		},
-		LayoutTemplates: map[model_function.ModelFrameLayerType]string{
-			model_function.ModelFrameLayerTypeDataClient: repoTemplate.RepoLayout,
+		LayoutTemplates: map[model_frame_path.ModelFrameLayerType]string{
+			model_frame_path.ModelFrameLayerTypeDataRepo: repoTemplate.RepoLayout,
 		},
 		ModelFramePath: modelFramePath,
 	}
 }
 
-func (r *golangTemplateRegistry) GetTemplatesForModelFrameLayer(layer model_function.ModelFrameLayerType) (templatesForLayer, string) {
+func (r *golangTemplateRegistry) GetTemplatesForModelFrameLayer(layer model_frame_path.ModelFrameLayerType) (templatesForLayer, string) {
 	return r.FunctionTemplates[r.ModelFramePath.FunctionType].LayerTemplates[layer], r.LayoutTemplates[layer]
 }

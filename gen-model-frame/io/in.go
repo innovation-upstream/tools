@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 
 	"github.com/pkg/errors"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/model"
+	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model"
 )
 
 func ParseModelsFile() ([]model.Model, error) {

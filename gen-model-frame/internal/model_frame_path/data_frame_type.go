@@ -1,4 +1,4 @@
-package model_function
+package model_frame_path
 
 type DataFrameType string
 

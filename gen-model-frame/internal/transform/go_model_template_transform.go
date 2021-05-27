@@ -4,14 +4,14 @@ import (
 	"strings"
 
 	"github.com/iancoleman/strcase"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/model"
-	modelTemplate "gitlab.innovationup.stream/innovation-upstream/gen-model-frame/model/generator/template"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/model/model_function"
+	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model"
+	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model_frame_path"
+	modelTemplate "gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/template"
 )
 
 type (
 	ModelFramePathGoTemplateTransformer interface {
-		ModelFramePathToBasicTemplateInputPtr(fp model_function.ModelFramePath) *model.BasicTemplateInput
+		ModelFramePathToBasicTemplateInputPtr(fp model_frame_path.ModelFramePath) *model.BasicTemplateInput
 		LayerSectionsToGoBasicLayoutTemplateInputPtr(layerSections map[modelTemplate.TemplateSection]string) *model.GoBasicLayoutTemplateInput
 	}
 	modelFramePathGoTemplateTransformer struct {
@@ -25,7 +25,7 @@ func NewModelFramePathGoTemplateTransformer(model *model.Model) ModelFramePathGo
 	}
 }
 
-func (t *modelFramePathGoTemplateTransformer) ModelFramePathToBasicTemplateInputPtr(fp model_function.ModelFramePath) *model.BasicTemplateInput {
+func (t *modelFramePathGoTemplateTransformer) ModelFramePathToBasicTemplateInputPtr(fp model_frame_path.ModelFramePath) *model.BasicTemplateInput {
 	n := t.model.Name
 	updatableFieldsStr := t.model.Metadata[model.ModelMetadataUpdatableFields]
 	updatableFields := strings.Split(updatableFieldsStr, ",")
