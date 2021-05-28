@@ -7,6 +7,7 @@ type ModelMetadata string
 const ModelMetadataUpdatableFields = ModelMetadata("updatable_fields")
 const ModelMetadataGolangModelPackagePath = ModelMetadata("golang_model_pkg_path")
 const ModelMetadataGolangModelPackage = ModelMetadata("golang_model_pkg")
+const ModelMetadataOutputBaseDirectory = ModelMetadata("output_base_directory")
 
 type Model struct {
 	Name       string                            `json:"name"`

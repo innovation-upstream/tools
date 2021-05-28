@@ -4,7 +4,7 @@ package model_frame_path
 // each other
 // Can be used to generate a chain of related functions (io, logic, data)
 type ModelFramePath struct {
-	FunctionType ModelFunctionType `json:"function_type"`
+	Type ModelFramePathType `json:"type"`
 	// What reference is used in this frame path
 	ReferenceType ReferenceType `json:"reference_type"`
 	DataFrameType DataFrameType `json:"data_frame_type"`

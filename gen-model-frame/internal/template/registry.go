@@ -28,7 +28,7 @@ type templatesForFunctionType struct {
 }
 
 type golangTemplateRegistry struct {
-	FunctionTemplates map[model_frame_path.ModelFunctionType]templatesForFunctionType
+	FunctionTemplates map[model_frame_path.ModelFramePathType]templatesForFunctionType
 	LayoutTemplates   map[model_frame_path.ModelFrameLayerType]string
 	ModelFramePath    model_frame_path.ModelFramePath
 }
@@ -74,8 +74,8 @@ func NewGolangTemplateRegistry(modelFramePath model_frame_path.ModelFramePath) T
 	*/
 
 	return &golangTemplateRegistry{
-		FunctionTemplates: map[model_frame_path.ModelFunctionType]templatesForFunctionType{
-			model_frame_path.ModelFunctionTypeCreate: createLayerTmpl,
+		FunctionTemplates: map[model_frame_path.ModelFramePathType]templatesForFunctionType{
+			model_frame_path.ModelFramePathTypeCreate: createLayerTmpl,
 		},
 		LayoutTemplates: map[model_frame_path.ModelFrameLayerType]string{
 			model_frame_path.ModelFrameLayerTypeDataRepo: repoTemplate.RepoLayout,
@@ -85,5 +85,5 @@ func NewGolangTemplateRegistry(modelFramePath model_frame_path.ModelFramePath) T
 }
 
 func (r *golangTemplateRegistry) GetTemplatesForModelFrameLayer(layer model_frame_path.ModelFrameLayerType) (templatesForLayer, string) {
-	return r.FunctionTemplates[r.ModelFramePath.FunctionType].LayerTemplates[layer], r.LayoutTemplates[layer]
+	return r.FunctionTemplates[r.ModelFramePath.Type].LayerTemplates[layer], r.LayoutTemplates[layer]
 }

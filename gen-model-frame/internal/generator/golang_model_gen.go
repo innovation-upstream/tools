@@ -10,7 +10,7 @@ import (
 
 type (
 	GolangModelGenerator interface {
-		Generate(m model.Model) (map[model_frame_path.ModelFunctionType]map[model_frame_path.ModelFrameLayerType]string, error)
+		Generate(m model.Model) (map[model_frame_path.ModelFramePathType]map[model_frame_path.ModelFrameLayerType]string, error)
 	}
 	golangModelGenerator struct{}
 )
@@ -19,8 +19,8 @@ func NewGolangModelGenerator() GolangModelGenerator {
 	return &golangModelGenerator{}
 }
 
-func (g *golangModelGenerator) Generate(m model.Model) (map[model_frame_path.ModelFunctionType]map[model_frame_path.ModelFrameLayerType]string, error) {
-	out := make(map[model_frame_path.ModelFunctionType]map[model_frame_path.ModelFrameLayerType]string)
+func (g *golangModelGenerator) Generate(m model.Model) (map[model_frame_path.ModelFramePathType]map[model_frame_path.ModelFrameLayerType]string, error) {
+	out := make(map[model_frame_path.ModelFramePathType]map[model_frame_path.ModelFrameLayerType]string)
 	tr := transform.NewModelFramePathGoTemplateTransformer(&m)
 	gen := template_hydrator.NewGoTemplateHydrator(tr)
 	for _, n := range m.FramePaths {
@@ -29,7 +29,7 @@ func (g *golangModelGenerator) Generate(m model.Model) (map[model_frame_path.Mod
 			return out, errors.WithStack(err)
 		}
 
-		out[n.FunctionType] = res
+		out[n.Type] = res
 	}
 
 	return out, nil

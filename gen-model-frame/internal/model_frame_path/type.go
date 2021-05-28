@@ -1,10 +1,10 @@
 package model_frame_path
 
-type ModelFunctionType string
+type ModelFramePathType string
 
-const ModelFunctionTypeCreate = ModelFunctionType("create")
-const ModelFunctionTypeUpdate = ModelFunctionType("update")
-const ModelFunctionTypeReadOne = ModelFunctionType("read_one")
-const ModelFunctionTypeReadPage = ModelFunctionType("read_page")
-const ModelFunctionTypeReadAll = ModelFunctionType("read_all")
-const ModelFunctionTypeDelete = ModelFunctionType("delete")
+const ModelFramePathTypeCreate = ModelFramePathType("create")
+const ModelFramePathTypeUpdate = ModelFramePathType("update")
+const ModelFramePathTypeReadOne = ModelFramePathType("read_one")
+const ModelFramePathTypeReadPage = ModelFramePathType("read_page")
+const ModelFramePathTypeReadAll = ModelFramePathType("read_all")
+const ModelFramePathTypeDelete = ModelFramePathType("delete")
