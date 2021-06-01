@@ -18,10 +18,9 @@ type (
 	}
 
 	GoBasicLayoutTemplateInput struct {
-		Basic               BasicLayoutTemplateInput
-		ModGoPackage        string
-		ModelGoPackagePath  string
-		InterfaceDefinition string
-		Methods             string
+		Basic              BasicLayoutTemplateInput
+		ModGoPackage       string
+		ModelGoPackagePath string
+		Sections           map[string]string
 	}
 )

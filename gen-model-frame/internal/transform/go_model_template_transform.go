@@ -6,13 +6,12 @@ import (
 	"github.com/iancoleman/strcase"
 	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model"
 	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model_frame_path"
-	modelTemplate "gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/template"
 )
 
 type (
 	ModelFramePathGoTemplateTransformer interface {
 		ModelFramePathToBasicTemplateInputPtr(fp model_frame_path.ModelFramePath) *model.BasicTemplateInput
-		LayerSectionsToGoBasicLayoutTemplateInputPtr(layerSections map[modelTemplate.TemplateSection]string) *model.GoBasicLayoutTemplateInput
+		LayerSectionsToGoBasicLayoutTemplateInputPtr(layerSections map[string]string) *model.GoBasicLayoutTemplateInput
 	}
 	modelFramePathGoTemplateTransformer struct {
 		model *model.Model
@@ -40,7 +39,7 @@ func (t *modelFramePathGoTemplateTransformer) ModelFramePathToBasicTemplateInput
 	}
 }
 
-func (t *modelFramePathGoTemplateTransformer) LayerSectionsToGoBasicLayoutTemplateInputPtr(layerSections map[modelTemplate.TemplateSection]string) *model.GoBasicLayoutTemplateInput {
+func (t *modelFramePathGoTemplateTransformer) LayerSectionsToGoBasicLayoutTemplateInputPtr(sections map[string]string) *model.GoBasicLayoutTemplateInput {
 	n := t.model.Name
 	basic := model.BasicLayoutTemplateInput{
 		ModCamel:      strcase.ToCamel(n),
@@ -53,10 +52,9 @@ func (t *modelFramePathGoTemplateTransformer) LayerSectionsToGoBasicLayoutTempla
 	goPkgPath := t.model.Metadata[model.ModelMetadataGolangModelPackagePath]
 
 	return &model.GoBasicLayoutTemplateInput{
-		Basic:               basic,
-		ModGoPackage:        goPkg,
-		ModelGoPackagePath:  goPkgPath,
-		InterfaceDefinition: layerSections[modelTemplate.TemplateSectionInterface],
-		Methods:             layerSections[modelTemplate.TemplateSectionMethod],
+		Basic:              basic,
+		ModGoPackage:       goPkg,
+		ModelGoPackagePath: goPkgPath,
+		Sections:           sections,
 	}
 }

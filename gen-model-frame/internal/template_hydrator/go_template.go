@@ -3,86 +3,72 @@ package template_hydrator
 import (
 	"bytes"
 	"html/template"
+	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
 	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model_frame_path"
-	modelTemplate "gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/template"
+	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/module"
 	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/transform"
 )
 
-type goTemplateHydrator struct {
-	transform transform.ModelFramePathGoTemplateTransformer
+type templateHydrator struct {
+	transform           transform.ModelFramePathGoTemplateTransformer
+	TemplatesForModules []*module.ModuleTemplates
 }
 
-func NewGoTemplateHydrator(transform transform.ModelFramePathGoTemplateTransformer) Generator {
-	return &goTemplateHydrator{
-		transform,
+func NewTemplateHydrator(transform transform.ModelFramePathGoTemplateTransformer, TemplatesForModules []*module.ModuleTemplates) Generator {
+	return &templateHydrator{
+		transform:           transform,
+		TemplatesForModules: TemplatesForModules,
 	}
 }
 
-func (g *goTemplateHydrator) Generate(mod model_frame_path.ModelFramePath) (map[model_frame_path.ModelFrameLayerType]string, error) {
-	out := make(map[model_frame_path.ModelFrameLayerType]string)
-	out, err := g.generateDataRepo(mod)
-	if err != nil {
-		return out, errors.WithStack(err)
-	}
+func (g *templateHydrator) Generate(framePath model_frame_path.ModelFramePath) (map[string]map[module.ModelFrameLayerLabel]string, error) {
+	out := make(map[string]map[module.ModelFrameLayerLabel]string)
 
-	return out, nil
-}
+	for _, m := range g.TemplatesForModules {
+		templatesForModuleLayers := make(map[module.ModelFrameLayerLabel]string)
+		templatesForFunction := m.GetTemplatesForFunctionLabel(framePath.FunctionType)
+		tmplData := g.transform.ModelFramePathToBasicTemplateInputPtr(framePath)
 
-func (g *goTemplateHydrator) generateDataRepo(framePath model_frame_path.ModelFramePath) (map[model_frame_path.ModelFrameLayerType]string, error) {
-	out := make(map[model_frame_path.ModelFrameLayerType]string)
-	layers := []model_frame_path.ModelFrameLayerType{
-		model_frame_path.ModelFrameLayerTypeIO,
-	}
-	//TODO: implement the rest of the dataframe types + handle different model frame types in template inline logic
-	switch framePath.DataFrameType {
-	case model_frame_path.DataFrameTypeRepo:
-		layers = append(layers, []model_frame_path.ModelFrameLayerType{
-			model_frame_path.ModelFrameLayerTypeDataRepo,
-			model_frame_path.ModelFrameLayerTypeLogicRepo,
-		}...)
-		break
-	case model_frame_path.DataFrameTypeRelay:
-		layers = append(layers, []model_frame_path.ModelFrameLayerType{
-			model_frame_path.ModelFrameLayerTypeDataRelay,
-			model_frame_path.ModelFrameLayerTypeLogicRelay,
-		}...)
-		break
-	case model_frame_path.DataFrameTypeClient:
-		layers = append(layers, []model_frame_path.ModelFrameLayerType{
-			model_frame_path.ModelFrameLayerTypeDataClient,
-			model_frame_path.ModelFrameLayerTypeLogicClient,
-		}...)
-		break
-	}
+		for _, l := range framePath.Layers {
+			layerName := module.ModelFrameLayerLabel(strings.Split(string(l), "::")[1])
+			layerTmplSections := make(map[string]string)
+			templatesForLayer := templatesForFunction.LayerTemplates[layerName]
+			layoutTemplate := templatesForFunction.LayoutTemplates[layerName]
 
-	tmplReg := modelTemplate.NewGolangTemplateRegistry(framePath)
-	tmplData := g.transform.ModelFramePathToBasicTemplateInputPtr(framePath)
-	for _, l := range layers {
-		layerTmplSections := make(map[modelTemplate.TemplateSection]string)
-		templatesForLayer, layoutTemplate := tmplReg.GetTemplatesForModelFrameLayer(l)
-		for section, tmpl := range templatesForLayer.SectionTemplates {
-			t := template.Must(template.New("mod_fp_tmpl").Parse(tmpl))
+			for section, tmpl := range templatesForLayer.SectionTemplates {
+				t := template.Must(template.New("mod_fp_tmpl").Parse(tmpl))
+				var buff bytes.Buffer
+				err := t.Execute(&buff, tmplData)
+				if err != nil {
+					return out, errors.WithStack(err)
+				}
+
+				trimmedOut := strings.Trim(buff.String(), "\n")
+				layerTmplSections[section] = trimmedOut
+			}
+			t := template.Must(template.New("mod_fp_layout_tmpl").Parse(layoutTemplate))
 			var buff bytes.Buffer
-			err := t.Execute(&buff, tmplData)
+			layoutTmplData := g.transform.LayerSectionsToGoBasicLayoutTemplateInputPtr(layerTmplSections)
+			err := t.Execute(&buff, layoutTmplData)
 			if err != nil {
 				return out, errors.WithStack(err)
 			}
 
-			trimmedOut := strings.Trim(buff.String(), "\n")
-			layerTmplSections[section] = trimmedOut
-		}
-		t := template.Must(template.New("mod_fp_layout_tmpl").Parse(layoutTemplate))
-		var buff bytes.Buffer
-		layoutTmplData := g.transform.LayerSectionsToGoBasicLayoutTemplateInputPtr(layerTmplSections)
-		err := t.Execute(&buff, layoutTmplData)
-		if err != nil {
-			return out, errors.WithStack(err)
+			templatesForModuleLayers[layerName] = buff.String()
 		}
 
-		out[l] = buff.String()
+		moduleName := m.Module.Name
+		var reAt = regexp.MustCompile(`^@`)
+		moduleName = reAt.ReplaceAllString(moduleName, "")
+		var reSlash = regexp.MustCompile(`\/`)
+		moduleName = reSlash.ReplaceAllString(moduleName, "_")
+		var reDash = regexp.MustCompile(`-`)
+		moduleName = reDash.ReplaceAllString(moduleName, "_")
+
+		out[moduleName] = templatesForModuleLayers
 	}
 
 	return out, nil

@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -32,13 +33,13 @@ func NewModelOut(model model.Model) ModelOut {
 func (o *modelOut) OutputGenerated(cfg config.ModelFrameGenConfig) error {
 	// TODO: if golang
 	goGen := generator.NewGolangModelGenerator()
-	out, err := goGen.Generate(o.Model)
+	functionContent, err := goGen.Generate(o.Model)
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
 	if cfg.OutputDirectory == "" {
-		raw, err := json.Marshal(out)
+		raw, err := json.Marshal(functionContent)
 		if err != nil {
 			return errors.WithStack(err)
 		}
@@ -48,34 +49,40 @@ func (o *modelOut) OutputGenerated(cfg config.ModelFrameGenConfig) error {
 	}
 
 	var sb strings.Builder
-	for _, v := range out {
-		for layer, content := range v {
-			strLayer := string(layer)
-			sb.Reset()
+	for _, v := range functionContent {
+		for moduleName, moduleContent := range v {
+			for layer, moduleContent := range moduleContent {
+				sb.Reset()
 
-			baseDirOverride := o.Model.Metadata[model.ModelMetadataOutputBaseDirectory]
-			if baseDirOverride != "" {
-				sb.WriteString(baseDirOverride)
-			}
+				strLayer := string(layer)
+				var reDash = regexp.MustCompile(`-`)
+				strLayer = reDash.ReplaceAllString(strLayer, "_")
 
-			sb.WriteString(cfg.OutputDirectory)
-			sb.WriteRune('/')
-			sb.WriteString(o.Model.Name)
-			sb.WriteRune('/')
-			sb.WriteString(strLayer)
+				baseDirOverride := o.Model.Metadata[model.ModelMetadataOutputBaseDirectory]
+				if baseDirOverride != "" {
+					sb.WriteString(baseDirOverride)
+					sb.WriteRune('/')
+				}
 
-			outDir := sb.String()
-			err = os.MkdirAll(outDir, 0755)
-			if err != nil {
-				return errors.WithStack(err)
-			}
+				sb.WriteString(cfg.OutputDirectory)
+				sb.WriteRune('/')
+				sb.WriteString(o.Model.Name)
+				sb.WriteRune('/')
+				sb.WriteString(strLayer)
 
-			sb.WriteRune('/')
-			sb.WriteString(fmt.Sprintf("%s.go", strLayer))
+				outDir := sb.String()
+				err = os.MkdirAll(outDir, 0755)
+				if err != nil {
+					return errors.WithStack(err)
+				}
 
-			err = ioutil.WriteFile(sb.String(), []byte(content), fs.FileMode(0444))
-			if err != nil {
-				return errors.WithStack(err)
+				sb.WriteRune('/')
+				sb.WriteString(fmt.Sprintf("%s_%s.go", strLayer, moduleName))
+
+				err = ioutil.WriteFile(sb.String(), []byte(moduleContent), fs.FileMode(0644))
+				if err != nil {
+					return errors.WithStack(err)
+				}
 			}
 		}
 	}

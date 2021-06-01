@@ -13,4 +13,5 @@ type Model struct {
 	Name       string                            `json:"name"`
 	Metadata   map[ModelMetadata]string          `json:"metadata"`
 	FramePaths []model_frame_path.ModelFramePath `json:"frame_paths"`
+	Modules    []string                          `json:"modules"`
 }
