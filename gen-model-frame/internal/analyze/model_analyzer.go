@@ -2,8 +2,8 @@ package analyze
 
 import (
 	"github.com/pkg/errors"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/module"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module"
 )
 
 type (
@@ -35,7 +35,7 @@ func (a *modelAnalyzer) GetModuleTemplates() ([]*module.ModuleTemplates, error) 
 
 	for _, modu := range modules {
 		for _, modModule := range a.Model.Modules {
-			if modModule == modu.Name {
+			if modModule == string(modu.Name) {
 				moduleTemplates, err := module.NewModuleTemplates(modu)
 				if err != nil {
 					return templatesForModules, errors.WithStack(err)

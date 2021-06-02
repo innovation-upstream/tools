@@ -42,7 +42,7 @@ func NewModuleTemplates(module *ModelFrameModule) (*ModuleTemplates, error) {
 
 			sectionTemplates := make(map[string]string)
 			for _, s := range l.Sections {
-				sectionTmpl, err := loader.LoadSectionTemplate(module.Name, f.Label, l.Label, s.Label)
+				sectionTmpl, err := loader.LoadSectionTemplate(string(module.Name), f.Label, l.Label, s.Label)
 				if err != nil {
 					return &mod, errors.WithStack(err)
 				}
@@ -54,7 +54,7 @@ func NewModuleTemplates(module *ModelFrameModule) (*ModuleTemplates, error) {
 				SectionTemplates: sectionTemplates,
 			}
 
-			layerTmpl, err := loader.LoadLayerLayoutTemplate(module.Name, l.Label)
+			layerTmpl, err := loader.LoadLayerLayoutTemplate(string(module.Name), l.Label)
 			if err != nil {
 				return &mod, errors.WithStack(err)
 			}

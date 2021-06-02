@@ -1,4 +1,4 @@
-module gitlab.innovationup.stream/innovation-upstream/gen-model-frame
+module gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame
 
 go 1.15
 

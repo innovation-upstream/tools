@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 
 	"github.com/pkg/errors"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/config"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/config"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
 )
 
 func ParseConfigFile() (config.ModelFrameGenConfig, error) {

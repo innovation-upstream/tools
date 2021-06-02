@@ -1,6 +1,6 @@
 package model_frame_path
 
-import "gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/module"
+import "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module"
 
 // Represent a collection of model frames and how they relate/interact with
 // each other

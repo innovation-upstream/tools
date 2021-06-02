@@ -10,13 +10,13 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/analyze"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/code_layer_generator"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/config"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/generator"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/module"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/transform"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/analyze"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/code_layer_generator"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/config"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/generator"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/transform"
 )
 
 type (

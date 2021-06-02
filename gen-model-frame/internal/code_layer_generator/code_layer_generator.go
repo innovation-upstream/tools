@@ -1,8 +1,8 @@
 package code_layer_generator
 
 import (
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model_frame_path"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/module"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model_frame_path"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module"
 )
 
 type CodeLayers map[module.ModelFrameLayerLabel]string

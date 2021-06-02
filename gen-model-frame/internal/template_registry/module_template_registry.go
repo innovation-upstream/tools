@@ -1,8 +1,8 @@
 package template_registry
 
 import (
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model_frame_path"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/module"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model_frame_path"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module"
 )
 
 type ModuleTemplateRegistry interface {

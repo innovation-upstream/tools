@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/io"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/io"
 	clog "unknwon.dev/clog/v2"
 )
 

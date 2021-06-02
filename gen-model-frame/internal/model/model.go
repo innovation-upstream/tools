@@ -1,6 +1,6 @@
 package model
 
-import "gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model_frame_path"
+import "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model_frame_path"
 
 type ModelMetadata string
 

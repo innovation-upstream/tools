@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/iancoleman/strcase"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model"
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/model_frame_path"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model_frame_path"
 )
 
 type (
