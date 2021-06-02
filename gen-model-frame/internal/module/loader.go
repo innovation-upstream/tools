@@ -10,6 +10,7 @@ import (
 )
 
 type (
+	//go:generate mockgen -destination=../mock/module_loader_mock.go -package=mock gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module ModuleLoader
 	ModuleLoader interface {
 		LoadSectionTemplate(moduleName string, functionLabel ModelFunctionLabel, layerLabel ModelFrameLayerLabel, sectionLabel string) (string, error)
 		LoadLayerLayoutTemplate(moduleName string, layerLabel ModelFrameLayerLabel) (string, error)

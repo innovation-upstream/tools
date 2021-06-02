@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/io"
+	"gitlab.innovationup.stream/innovation-upstream/gen-model-frame/internal/io"
 	clog "unknwon.dev/clog/v2"
 )
 
@@ -33,8 +33,8 @@ func main() {
 	}
 
 	for _, m := range mods {
-		outGen := io.NewModelOut(m)
-		err := outGen.OutputGenerated(cfg)
+		outGen := io.NewModelOut(m, cfg)
+		err := outGen.OutputGenerated()
 		if err != nil {
 			fmt.Printf("%+v", fmt.Errorf("%+v", err))
 			os.Exit(1)

@@ -9,6 +9,7 @@ import (
 )
 
 type (
+	//go:generate mockgen -destination=../mock/model_frame_path_go_template_transformer_mock.go -package=mock gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/transform ModelFramePathGoTemplateTransformer
 	ModelFramePathGoTemplateTransformer interface {
 		ModelFramePathToBasicTemplateInputPtr(fp model_frame_path.ModelFramePath) *model.BasicTemplateInput
 		LayerSectionsToGoBasicLayoutTemplateInputPtr(layerSections map[string]string) *model.GoBasicLayoutTemplateInput
