@@ -1,8 +1,6 @@
 package transform
 
 import (
-	"strings"
-
 	"github.com/iancoleman/strcase"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model_frame_path"
@@ -27,8 +25,6 @@ func NewModelFramePathGoTemplateTransformer(model *model.Model) ModelFramePathGo
 
 func (t *modelFramePathGoTemplateTransformer) ModelFramePathToBasicTemplateInputPtr(fp model_frame_path.ModelFramePath) *model.BasicTemplateInput {
 	n := t.model.Name
-	updatableFieldsStr := t.model.Metadata[model.ModelMetadataUpdatableFields]
-	updatableFields := strings.Split(updatableFieldsStr, ",")
 	return &model.BasicTemplateInput{
 		ModCamel:                strcase.ToCamel(n),
 		ModLowerCamel:           strcase.ToLowerCamel(n),
@@ -36,7 +32,7 @@ func (t *modelFramePathGoTemplateTransformer) ModelFramePathToBasicTemplateInput
 		ModKebab:                strcase.ToKebab(n),
 		ReferenceTypeCamel:      strcase.ToCamel(string(fp.ReferenceType)),
 		ReferenceTypeLowerCamel: strcase.ToLowerCamel(string(fp.ReferenceType)),
-		UpdateableFields:        updatableFields,
+		MetaData:                t.model.Metadata,
 	}
 }
 
@@ -48,14 +44,8 @@ func (t *modelFramePathGoTemplateTransformer) LayerSectionsToGoBasicLayoutTempla
 		ModSnake:      strcase.ToSnake(n),
 	}
 
-	// TODO: fail if either are empty
-	goPkg := t.model.Metadata[model.ModelMetadataGolangModelPackage]
-	goPkgPath := t.model.Metadata[model.ModelMetadataGolangModelPackagePath]
-
 	return &model.GoBasicLayoutTemplateInput{
-		Basic:              basic,
-		ModGoPackage:       goPkg,
-		ModelGoPackagePath: goPkgPath,
-		Sections:           sections,
+		Basic:    basic,
+		Sections: sections,
 	}
 }

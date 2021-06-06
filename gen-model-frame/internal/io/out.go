@@ -16,6 +16,7 @@ import (
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/generator"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module/registry"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/transform"
 )
 
@@ -39,7 +40,8 @@ func NewModelOut(model model.Model, cfg config.ModelFrameGenConfig) ModelOut {
 
 func (o *modelOut) OutputGenerated() error {
 	// TODO: if golang
-	moduleLoader := module.NewModuleLoader()
+	reg := registry.NewFileSystemModuleRegistry("modules")
+	moduleLoader := module.NewModuleLoader(reg)
 	an := analyze.NewModelAnalyzer(o.Model, moduleLoader)
 
 	templatesForModules, err := an.GetModuleTemplates()
@@ -76,7 +78,7 @@ func (o *modelOut) OutputGenerated() error {
 				var reDash = regexp.MustCompile(`-`)
 				strLayer = reDash.ReplaceAllString(strLayer, "_")
 
-				baseDirOverride := o.Model.Metadata[model.ModelMetadataOutputBaseDirectory]
+				baseDirOverride := o.Model.Output.Directory
 				if baseDirOverride != "" {
 					sb.WriteString(baseDirOverride)
 					sb.WriteRune('/')

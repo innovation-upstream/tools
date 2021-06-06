@@ -4,23 +4,27 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
 
 	"github.com/pkg/errors"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module/registry"
 )
 
+//go:generate mockgen -destination=../mock/module_loader_mock.go -package=mock gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module ModuleLoader
 type (
-	//go:generate mockgen -destination=../mock/module_loader_mock.go -package=mock gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module ModuleLoader
 	ModuleLoader interface {
 		LoadSectionTemplate(moduleName string, functionLabel ModelFunctionLabel, layerLabel ModelFrameLayerLabel, sectionLabel string) (string, error)
 		LoadLayerLayoutTemplate(moduleName string, layerLabel ModelFrameLayerLabel) (string, error)
-		LoadModules(modulesDir string) ([]*ModelFrameModule, error)
+		LoadAllModulesFromDirectory(modulesDir string) ([]*ModelFrameModule, error)
 	}
-	moduleLoader struct{}
+	moduleLoader struct {
+		Registry registry.ModuleRegistry
+	}
 )
 
-func NewModuleLoader() ModuleLoader {
-	return &moduleLoader{}
+func NewModuleLoader(registry registry.ModuleRegistry) ModuleLoader {
+	return &moduleLoader{
+		Registry: registry,
+	}
 }
 
 func (l *moduleLoader) LoadSectionTemplate(moduleName string, functionLabel ModelFunctionLabel, layerLabel ModelFrameLayerLabel, sectionLabel string) (string, error) {
@@ -51,42 +55,28 @@ func (l *moduleLoader) LoadLayerLayoutTemplate(moduleName string, layerLabel Mod
 	return tmpl, nil
 }
 
-func (l *moduleLoader) LoadModules(modulesDir string) ([]*ModelFrameModule, error) {
+func (l *moduleLoader) LoadAllModulesFromDirectory(modulesDir string) ([]*ModelFrameModule, error) {
 	var modules []*ModelFrameModule
 
-	f, err := os.Open(modulesDir)
-	if err != nil {
-		return modules, errors.WithStack(err)
-	}
-	defer f.Close()
-
-	files, err := f.Readdir(-1)
+	headers, err := l.Registry.QueryAllModuleHeaders()
 	if err != nil {
 		return modules, errors.WithStack(err)
 	}
 
-	for _, file := range files {
-		if file.IsDir() {
-			moduleJSONFilePath := fmt.Sprintf("%s/%s/module.json", modulesDir, file.Name())
-			// if its a namespaced module dir, load nested modules
-			if _, err := os.Stat(moduleJSONFilePath); errors.Is(err, os.ErrNotExist) {
-				nsModuleDir := fmt.Sprintf("%s/%s", modulesDir, file.Name())
-				nsModules, err := l.LoadModules(nsModuleDir)
-				if err != nil {
-					return modules, errors.WithStack(err)
-				}
-
-				modules = append(modules, nsModules...)
-				continue
-			}
-
-			module, err := l.loadModule(modulesDir, file.Name())
-			if err != nil {
-				return modules, errors.WithStack(err)
-			}
-
-			modules = append(modules, &module)
+	for _, h := range headers {
+		var module ModelFrameModule
+		mJSON, err := h.GetJSON()
+		if err != nil {
+			return modules, errors.WithStack(err)
 		}
+
+		err = json.Unmarshal([]byte(mJSON), &module)
+		if err != nil {
+			errMsg := fmt.Sprintf("failed loading %s", mJSON)
+			return modules, errors.WithMessage(errors.WithStack(err), errMsg)
+		}
+
+		modules = append(modules, &module)
 	}
 
 	return modules, nil

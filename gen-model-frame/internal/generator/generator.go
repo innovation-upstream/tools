@@ -33,10 +33,13 @@ func (g *modelFrameGenerator) GenerateFrames() (map[module.ModelFunctionLabel]co
 	out := make(map[module.ModelFunctionLabel]code_layer_generator.ModuleCodeLayers)
 
 	for _, n := range g.Model.FramePaths {
+		// TODO: add feature to allow models.json to specify custom generator binary
 		res, err := g.CodeLayerGenerator.GenerateCodeLayersForFramePath(n)
 		if err != nil {
 			return out, errors.WithStack(err)
 		}
+
+		// TODO: this is where we would call plugins for post-processing
 
 		out[n.FunctionType] = res
 	}

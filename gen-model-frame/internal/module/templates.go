@@ -2,6 +2,7 @@ package module
 
 import (
 	"github.com/pkg/errors"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module/registry"
 )
 
 type (
@@ -20,10 +21,12 @@ type (
 	}
 )
 
+// TODO: this probably belongs in registry pkg
 func NewModuleTemplates(module *ModelFrameModule) (*ModuleTemplates, error) {
 	var mod ModuleTemplates
 	templates := make(map[ModelFunctionLabel]TemplatesForFunctionType)
-	loader := NewModuleLoader()
+	reg := registry.NewFileSystemModuleRegistry("modules")
+	loader := NewModuleLoader(reg)
 
 	for _, f := range module.Functions {
 		var funcTemplates TemplatesForFunctionType

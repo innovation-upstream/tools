@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"strings"
 
+	"github.com/Masterminds/sprig"
 	"github.com/pkg/errors"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model_frame_path"
@@ -56,7 +57,9 @@ func (g *templateHydrator) hydrateModuleTemplates(framePath model_frame_path.Mod
 		}
 
 		layoutTemplate := templatesForFunction.LayoutTemplates[layerName]
-		t := template.Must(template.New("mod_fp_layout_tmpl").Parse(layoutTemplate))
+		t := template.Must(
+			template.New("mod_fp_layout_tmpl").Funcs(sprig.FuncMap()).Parse(layoutTemplate),
+		)
 		var buff bytes.Buffer
 		layoutTmplData := g.transform.LayerSectionsToGoBasicLayoutTemplateInputPtr(layerTmplSections)
 		err = t.Execute(&buff, layoutTmplData)
@@ -88,7 +91,9 @@ func (g *templateHydrator) hydrateLayerTemplates(templatesForLayer module.Templa
 func (g *templateHydrator) hydrateLayerSectionTemplate(tmpl string, data *model.BasicTemplateInput) (string, error) {
 	var hydratedSection string
 
-	t := template.Must(template.New("layer_section_tmpl").Parse(tmpl))
+	t := template.Must(
+		template.New("layer_section_tmpl").Funcs(sprig.FuncMap()).Parse(tmpl),
+	)
 	var buff bytes.Buffer
 	err := t.Execute(&buff, data)
 	if err != nil {

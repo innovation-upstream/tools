@@ -8,7 +8,6 @@ import "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/int
 type ModelFramePath struct {
 	FunctionType module.ModelFunctionLabel `json:"type"`
 	// What reference is used in this frame path
-	ReferenceType ReferenceType                 `json:"reference_type"`
-	DataFrameType DataFrameType                 `json:"data_frame_type"`
+	ReferenceType ReferenceType                 `json:"referenceType"`
 	Layers        []module.ModelFrameLayerLabel `json:"layers"`
 }

@@ -4,14 +4,14 @@ import "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/int
 
 type ModelMetadata string
 
-const ModelMetadataUpdatableFields = ModelMetadata("updatable_fields")
-const ModelMetadataGolangModelPackagePath = ModelMetadata("golang_model_pkg_path")
-const ModelMetadataGolangModelPackage = ModelMetadata("golang_model_pkg")
-const ModelMetadataOutputBaseDirectory = ModelMetadata("output_base_directory")
-
 type Model struct {
 	Name       string                            `json:"name"`
-	Metadata   map[ModelMetadata]string          `json:"metadata"`
-	FramePaths []model_frame_path.ModelFramePath `json:"frame_paths"`
+	Metadata   map[string]string                 `json:"metadata"`
+	FramePaths []model_frame_path.ModelFramePath `json:"framePaths"`
 	Modules    []string                          `json:"modules"`
+	Output     ModelOutput                       `json:"output"`
+}
+
+type ModelOutput struct {
+	Directory string `json:"directory"`
 }

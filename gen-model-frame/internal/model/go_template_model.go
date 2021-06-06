@@ -8,7 +8,7 @@ type (
 		ModKebab                string
 		ReferenceTypeCamel      string
 		ReferenceTypeLowerCamel string
-		UpdateableFields        []string
+		MetaData                map[string]string
 	}
 
 	BasicLayoutTemplateInput struct {
@@ -18,9 +18,7 @@ type (
 	}
 
 	GoBasicLayoutTemplateInput struct {
-		Basic              BasicLayoutTemplateInput
-		ModGoPackage       string
-		ModelGoPackagePath string
-		Sections           map[string]string
+		Basic    BasicLayoutTemplateInput
+		Sections map[string]string
 	}
 )

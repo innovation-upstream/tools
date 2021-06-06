@@ -28,7 +28,7 @@ func NewModelAnalyzer(m model.Model, l module.ModuleLoader) ModelAnalyzer {
 func (a *modelAnalyzer) GetModuleTemplates() ([]*module.ModuleTemplates, error) {
 	var templatesForModules []*module.ModuleTemplates
 	// TODO: only load the modules we are going to use
-	modules, err := a.ModuleLoader.LoadModules("modules")
+	modules, err := a.ModuleLoader.LoadAllModulesFromDirectory("modules")
 	if err != nil {
 		return templatesForModules, errors.WithStack(err)
 	}
