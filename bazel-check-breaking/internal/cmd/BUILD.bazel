@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "cmd",
+    srcs = ["check_breaking.go"],
+    importpath = "gitlab.innovationup.stream/innovation-upstream/tools/bazel-check-breaking/internal/cmd",
+    visibility = ["//bazel-check-breaking:__subpackages__"],
+    deps = [
+        "//bazel-check-breaking/internal/changes",
+        "//bazel-check-breaking/internal/check",
+        "@com_github_pkg_errors//:go_default_library",
+    ],
+)
+
+alias(
+    name = "go_default_library",
+    actual = ":cmd",
+    visibility = ["//bazel-check-breaking:__subpackages__"],
+)

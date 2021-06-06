@@ -1,0 +1,42 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@io_bazel_rules_docker//go:image.bzl", "go_image")
+load("@io_bazel_rules_docker//container:container.bzl", "container_bundle")
+
+go_image(
+    name = "image",
+    embed = [":go_default_library"],
+    visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "go_default_library",
+    srcs = ["main.go"],
+    importpath = "gitlab.innovationup.stream/innovation-upstream/iu-common-container/service/mailgun-interface",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//service/mailgun-interface/internal/factory:go_default_library",
+        "//service/mailgun-interface/internal/rpc:go_default_library",
+        "//service/pb/service:go_default_library",
+        "@com_github_grpc_ecosystem_go_grpc_middleware//:go_default_library",
+        "@com_github_grpc_ecosystem_go_grpc_middleware//validator:go_default_library",
+        "@dev_unknwon_clog_v2//:go_default_library",
+        "@io_opentelemetry_go_contrib_instrumentation_google_golang_org_grpc//:go_default_library",
+        "@io_opentelemetry_go_otel//api/global:go_default_library",
+        "@org_golang_google_grpc//:go_default_library",
+        "@stream_innovationup_gitlab_innovation_upstream_iu_common_go//monitor:go_default_library",
+    ],
+)
+
+go_binary(
+    name = "mailgun-interface",
+    embed = [":bazel-check-breaking_lib"],
+    visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "bazel-check-breaking_lib",
+    srcs = ["main.go"],
+    importpath = "gitlab.innovationup.stream/innovation-upstream/tools/bazel-check-breaking",
+    visibility = ["//visibility:private"],
+    deps = ["//bazel-check-breaking/internal/cmd"],
+)

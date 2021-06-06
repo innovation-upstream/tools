@@ -1,0 +1,18 @@
+mailgun_interface_publish_image:
+  variables:
+    CONTAINER_NAME: mailgun-interface
+  cache:
+    key: $USE_BAZEL_VERSION
+    paths:
+      - output
+  extends: .publish
+  rules:
+    - if: '($CI_PIPELINE_SOURCE == "push") && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "production")'
+      changes:
+        - "service/mailgun-interface/**/*"
+      when: on_success
+    - if: '$FORCE_PIPELINE == "true" || $FORCE_MAILGUN_INTERFACE_SERVICE_CONTAINER_PIPELINE == "true"'
+      when: on_success
+  needs:
+    - buf_generate
+
