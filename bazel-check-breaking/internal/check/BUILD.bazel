@@ -8,7 +8,7 @@ go_library(
     ],
     importpath = "gitlab.innovationup.stream/innovation-upstream/tools/bazel-check-breaking/internal/check",
     visibility = ["//bazel-check-breaking:__subpackages__"],
-    deps = ["@com_github_pkg_errors//:go_default_library"],
+    deps = ["@dev_unknwon_clog_v2//:go_default_library"],
 )
 
 alias(

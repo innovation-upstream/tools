@@ -1,0 +1,115 @@
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+# You *must* import the Go rules before setting up the go_image rules.
+http_archive(
+    name = "io_bazel_rules_go",
+    sha256 = "69de5c704a05ff37862f7e0f5534d4f479418afc21806c887db544a316f3cb6b",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.27.0/rules_go-v0.27.0.tar.gz",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.27.0/rules_go-v0.27.0.tar.gz",
+    ],
+)
+
+http_archive(
+    name = "bazel_gazelle",
+    sha256 = "62ca106be173579c0a167deb23358fdfe71ffa1e4cfdddf5582af26520f1c66f",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-gazelle/releases/download/v0.23.0/bazel-gazelle-v0.23.0.tar.gz",
+        "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.23.0/bazel-gazelle-v0.23.0.tar.gz",
+    ],
+)
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
+
+go_rules_dependencies()
+
+go_register_toolchains(version = "1.16.2")
+
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
+
+gazelle_dependencies()
+
+go_repository(
+    name = "com_github_davecgh_go_spew",
+    importpath = "github.com/davecgh/go-spew",
+    sum = "h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=",
+    version = "v1.1.0",
+)
+
+go_repository(
+    name = "com_github_fatih_color",
+    importpath = "github.com/fatih/color",
+    sum = "h1:DkWD4oS2D8LGGgTQ6IvwJJXSL5Vp2ffcQg58nFV38Ys=",
+    version = "v1.7.0",
+)
+
+go_repository(
+    name = "com_github_mattn_go_colorable",
+    importpath = "github.com/mattn/go-colorable",
+    sum = "h1:snbPLB8fVfU9iwbbo30TPtbLRzwWu6aJS6Xh4eaaviA=",
+    version = "v0.1.4",
+)
+
+go_repository(
+    name = "com_github_mattn_go_isatty",
+    importpath = "github.com/mattn/go-isatty",
+    sum = "h1:qxFzApOv4WsAL965uUPIsXzAKCZxN2p9UqdhFS4ZW10=",
+    version = "v0.0.10",
+)
+
+go_repository(
+    name = "com_github_pkg_errors",
+    importpath = "github.com/pkg/errors",
+    sum = "h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=",
+    version = "v0.9.1",
+)
+
+go_repository(
+    name = "com_github_pmezard_go_difflib",
+    importpath = "github.com/pmezard/go-difflib",
+    sum = "h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=",
+    version = "v1.0.0",
+)
+
+go_repository(
+    name = "com_github_stretchr_objx",
+    importpath = "github.com/stretchr/objx",
+    sum = "h1:4G4v2dO3VZwixGIRoQ5Lfboy6nUhCyYzaqnIAPPhYs4=",
+    version = "v0.1.0",
+)
+
+go_repository(
+    name = "com_github_stretchr_testify",
+    importpath = "github.com/stretchr/testify",
+    sum = "h1:2E4SXV/wtOkTonXsotYi4li6zVWxYlZuYNCXe9XRJyk=",
+    version = "v1.4.0",
+)
+
+go_repository(
+    name = "dev_unknwon_clog_v2",
+    importpath = "unknwon.dev/clog/v2",
+    sum = "h1:jkPdsxux0MC04BT/9NHbT75z4prK92SH10VBNmIpVCc=",
+    version = "v2.2.0",
+)
+
+go_repository(
+    name = "in_gopkg_check_v1",
+    importpath = "gopkg.in/check.v1",
+    sum = "h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=",
+    version = "v0.0.0-20161208181325-20d25e280405",
+)
+
+go_repository(
+    name = "in_gopkg_yaml_v2",
+    importpath = "gopkg.in/yaml.v2",
+    sum = "h1:ZCJp+EgiOT7lHqUV2J862kp8Qj64Jo6az82+3Td9dZw=",
+    version = "v2.2.2",
+)
+
+go_repository(
+    name = "org_golang_x_sys",
+    importpath = "golang.org/x/sys",
+    sum = "h1:QAcqgptGM8IQBC9K/RC4o+O9YmqEm0diQn9QmZw/0mU=",
+    version = "v0.0.0-20191008105621-543471e840be",
+)

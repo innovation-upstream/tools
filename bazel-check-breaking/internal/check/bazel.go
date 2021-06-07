@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/pkg/errors"
+	"unknwon.dev/clog/v2"
 )
 
 type (
@@ -24,11 +24,11 @@ func NewBazelCheck(targetScope string) Check {
 	}
 }
 
-func (c *bazelCheck) GetPotentiallyBrokenConsumers(workspaceFilePaths []string, allConsumers []string) []string {
+func (c *bazelCheck) GetPotentiallyBrokenConsumers(workspaceFilePaths []string, allConsumers []string) ([]string, error) {
 	var dependantBins []string
 	for _, f := range workspaceFilePaths {
 		if f == "" {
-			return dependantBins
+			continue
 		}
 
 		var removeFile = regexp.MustCompile(`.[^/]*$`)
@@ -38,12 +38,11 @@ func (c *bazelCheck) GetPotentiallyBrokenConsumers(workspaceFilePaths []string, 
 		rDepsCmd := exec.Command("bazel", "query", "--output", "label", fmt.Sprintf("rdeps(%s, //%s)", c.targetScope, path))
 		rDepsOut, err := rDepsCmd.CombinedOutput()
 		if err != nil {
-			fmt.Printf("err: %+v", string(rDepsOut))
-			panic(errors.WithStack(err))
+			clog.Warn("warning bazel query failed with error: %+v", string(rDepsOut))
+			continue
 		}
 
 		dependentConsumers := strings.Split(string(rDepsOut), "\n")
-		//fmt.Printf("%+v\n", dependentConsumers)
 		for _, dt := range dependentConsumers {
 			if isBazelLabel.MatchString(dt) {
 				d := removeBazelLabelName.ReplaceAllString(dt, "")
@@ -65,5 +64,5 @@ func (c *bazelCheck) GetPotentiallyBrokenConsumers(workspaceFilePaths []string, 
 		}
 	}
 
-	return dependantBins
+	return dependantBins, nil
 }

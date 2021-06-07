@@ -43,10 +43,11 @@ func CheckBreaking(fromSHA string, toSHA string, bazelTargetScope string) ([]str
 		}
 	}
 
-	//fmt.Printf("%+v\n", allBins)
-
 	c := check.NewBazelCheck(bazelTargetScope)
-	potentiallyBrokenConsumers = c.GetPotentiallyBrokenConsumers(changedFiles, allBins)
+	potentiallyBrokenConsumers, err = c.GetPotentiallyBrokenConsumers(changedFiles, allBins)
+	if err != nil {
+		return potentiallyBrokenConsumers, errors.WithStack(err)
+	}
 
 	return potentiallyBrokenConsumers, nil
 }

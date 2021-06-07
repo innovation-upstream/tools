@@ -6,8 +6,8 @@ go_library(
     importpath = "gitlab.innovationup.stream/innovation-upstream/tools/bazel-check-breaking/internal/cmd",
     visibility = ["//bazel-check-breaking:__subpackages__"],
     deps = [
-        "//bazel-check-breaking/internal/changes",
-        "//bazel-check-breaking/internal/check",
+        "//internal/changes",
+        "//internal/check",
         "@com_github_pkg_errors//:go_default_library",
     ],
 )
