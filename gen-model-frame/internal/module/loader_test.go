@@ -129,7 +129,7 @@ func Test_moduleLoader_LoadAllModulesFromDirectory(t *testing.T) {
 				Label: "create",
 			},
 		},
-		Layers: []ModelFrameLayer{
+		Layers: []ModelLayer{
 			{
 				Label:     "data-logic",
 				Functions: []ModelFunctionLabel{"@builtin/golang-api::create"},

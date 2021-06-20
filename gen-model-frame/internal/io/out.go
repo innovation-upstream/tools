@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"io/ioutil"
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -74,9 +73,7 @@ func (o *modelOut) OutputGenerated() error {
 			for layer, moduleContent := range moduleContent {
 				sb.Reset()
 
-				strLayer := string(layer)
-				var reDash = regexp.MustCompile(`-`)
-				strLayer = reDash.ReplaceAllString(strLayer, "_")
+				strLayer := layer.GetFileFriendlyName()
 
 				baseDirOverride := o.Model.Output.Directory
 				if baseDirOverride != "" {
@@ -97,7 +94,7 @@ func (o *modelOut) OutputGenerated() error {
 				}
 
 				sb.WriteRune('/')
-				sb.WriteString(fmt.Sprintf("%s_%s.go", strLayer, moduleName))
+				sb.WriteString(fmt.Sprintf("%s.go", moduleName))
 
 				err = ioutil.WriteFile(sb.String(), []byte(moduleContent), fs.FileMode(0644))
 				if err != nil {

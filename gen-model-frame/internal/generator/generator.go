@@ -4,14 +4,14 @@ import (
 	"github.com/pkg/errors"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/analyze"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/code_layer_generator"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/label"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
-	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module"
 )
 
 type (
 	//go:generate mockgen -destination=../mock/model_frame_generator_mock.go -package=mock gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/generator ModelFrameGenerator
 	ModelFrameGenerator interface {
-		GenerateFrames() (map[module.ModelFunctionLabel]code_layer_generator.ModuleCodeLayers, error)
+		GenerateFrames() (map[label.ModelFrameResourceLabel]code_layer_generator.ModuleCodeLayers, error)
 	}
 
 	modelFrameGenerator struct {
@@ -29,8 +29,8 @@ func NewModelFrameGenerator(m model.Model, modelAnalyzer analyze.ModelAnalyzer, 
 	}
 }
 
-func (g *modelFrameGenerator) GenerateFrames() (map[module.ModelFunctionLabel]code_layer_generator.ModuleCodeLayers, error) {
-	out := make(map[module.ModelFunctionLabel]code_layer_generator.ModuleCodeLayers)
+func (g *modelFrameGenerator) GenerateFrames() (map[label.ModelFrameResourceLabel]code_layer_generator.ModuleCodeLayers, error) {
+	out := make(map[label.ModelFrameResourceLabel]code_layer_generator.ModuleCodeLayers)
 
 	for _, n := range g.Model.FramePaths {
 		// TODO: add feature to allow models.json to specify custom generator binary

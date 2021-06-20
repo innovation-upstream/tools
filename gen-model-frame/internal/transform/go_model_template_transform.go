@@ -10,7 +10,7 @@ type (
 	//go:generate mockgen -destination=../mock/model_frame_path_go_template_transformer_mock.go -package=mock gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/transform ModelFramePathGoTemplateTransformer
 	ModelFramePathGoTemplateTransformer interface {
 		ModelFramePathToBasicTemplateInputPtr(fp model_frame_path.ModelFramePath) *model.BasicTemplateInput
-		LayerSectionsToGoBasicLayoutTemplateInputPtr(layerSections map[string]string) *model.GoBasicLayoutTemplateInput
+		LayerSectionsToGoBasicLayoutTemplateInputPtr(basic model.BasicTemplateInput, layerSections map[string]string) *model.GoBasicLayoutTemplateInput
 	}
 	modelFramePathGoTemplateTransformer struct {
 		model *model.Model
@@ -32,18 +32,11 @@ func (t *modelFramePathGoTemplateTransformer) ModelFramePathToBasicTemplateInput
 		ModKebab:                strcase.ToKebab(n),
 		ReferenceTypeCamel:      strcase.ToCamel(string(fp.ReferenceType)),
 		ReferenceTypeLowerCamel: strcase.ToLowerCamel(string(fp.ReferenceType)),
-		MetaData:                t.model.Metadata,
+		MetaData:                t.model.MetaData,
 	}
 }
 
-func (t *modelFramePathGoTemplateTransformer) LayerSectionsToGoBasicLayoutTemplateInputPtr(sections map[string]string) *model.GoBasicLayoutTemplateInput {
-	n := t.model.Name
-	basic := model.BasicLayoutTemplateInput{
-		ModCamel:      strcase.ToCamel(n),
-		ModLowerCamel: strcase.ToLowerCamel(n),
-		ModSnake:      strcase.ToSnake(n),
-	}
-
+func (t *modelFramePathGoTemplateTransformer) LayerSectionsToGoBasicLayoutTemplateInputPtr(basic model.BasicTemplateInput, sections map[string]string) *model.GoBasicLayoutTemplateInput {
 	return &model.GoBasicLayoutTemplateInput{
 		Basic:    basic,
 		Sections: sections,

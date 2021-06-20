@@ -1,0 +1,46 @@
+package label
+
+import (
+	"regexp"
+	"strings"
+)
+
+type ModelFrameResourceLabel string
+
+var ModelFrameResourceLabelPattern = regexp.MustCompile(`^(@[A-Za-z-_]+\/)?[A-Za-z-_]+::(((function)|(section)|(layer))+\/)[A-Za-z-_]+$`)
+
+// GetNamespace returns the namespace represented in the label.
+// e.g. "@innovation-updatem/golang-api" "golang-api"
+func (l ModelFrameResourceLabel) GetNamespace() string {
+	return strings.Split(string(l), "::")[0]
+}
+
+// GetResourceType returns the resource type represented by the label.
+// e.g. "layer"
+func (l ModelFrameResourceLabel) GetResourceType() string {
+	return strings.Split(strings.Split(string(l), "::")[1], "/")[0]
+}
+
+// GetResourceName returns the name of the resource represented by the label.
+// e.g. "data-repo"
+func (l ModelFrameResourceLabel) GetResourceName() string {
+	return strings.Split(strings.Split(string(l), "::")[1], "/")[1]
+}
+
+func (n ModelFrameResourceLabel) GetFileFriendlyName() string {
+	moduleName := string(n)
+
+	var reAt = regexp.MustCompile(`^@`)
+	moduleName = reAt.ReplaceAllString(moduleName, "")
+
+	var reSlash = regexp.MustCompile(`\/`)
+	moduleName = reSlash.ReplaceAllString(moduleName, "_")
+
+	var reDash = regexp.MustCompile(`-`)
+	moduleName = reDash.ReplaceAllString(moduleName, "_")
+
+	var reColon = regexp.MustCompile(`::`)
+	moduleName = reColon.ReplaceAllString(moduleName, "_")
+
+	return moduleName
+}

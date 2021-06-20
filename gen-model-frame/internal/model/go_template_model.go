@@ -11,14 +11,8 @@ type (
 		MetaData                map[string]string
 	}
 
-	BasicLayoutTemplateInput struct {
-		ModCamel      string
-		ModLowerCamel string
-		ModSnake      string
-	}
-
 	GoBasicLayoutTemplateInput struct {
-		Basic    BasicLayoutTemplateInput
+		Basic    BasicTemplateInput
 		Sections map[string]string
 	}
 )
