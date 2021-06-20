@@ -10,7 +10,7 @@ import (
 type (
 	//go:generate mockgen -destination=../mock/model_analyzer_mock.go -package=mock gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/analyze ModelAnalyzer
 	ModelAnalyzer interface {
-		GetModuleTemplates() ([]*module.ModuleTemplates, error)
+		GetModules() ([]*module.ModelFrameModule, error)
 		GetDependencyModules(prevLayerModules []*module.ModelFrameModule) ([]*module.ModelFrameModule, error)
 	}
 
@@ -62,41 +62,30 @@ func (a *modelAnalyzer) GetDependencyModules(prevLayerModules []*module.ModelFra
 	return modules, nil
 }
 
-func (a *modelAnalyzer) GetModuleTemplates() ([]*module.ModuleTemplates, error) {
-	var templatesForModules []*module.ModuleTemplates
+func (a *modelAnalyzer) GetModules() ([]*module.ModelFrameModule, error) {
+	var modules []*module.ModelFrameModule
 
 	var modulesToLoad []label.ModelFrameResourceLabel
-	for _, modelFrameModuleName := range a.Model.Modules {
-		modulesToLoad = append(modulesToLoad, modelFrameModuleName)
+	for _, fp := range a.Model.FramePaths {
+		for _, modelFrameModuleName := range fp.Layers {
+			modulesToLoad = append(modulesToLoad, modelFrameModuleName)
+		}
 	}
 
 	// load the modules the model directly depeonds on
 	directModules, err := a.ModuleLoader.LoadModules(modulesToLoad)
 	if err != nil {
-		return templatesForModules, errors.WithStack(err)
+		return modules, errors.WithStack(err)
 	}
 
 	// Recursive load transitive modules (modules that direct modules depend on)
 	depModules, err := a.GetDependencyModules(directModules)
 	if err != nil {
-		return templatesForModules, errors.WithStack(err)
+		return modules, errors.WithStack(err)
 	}
 
 	// concat direct modules with all dep modules
-	modules := append(directModules, depModules...)
+	modules = append(directModules, depModules...)
 
-	for _, modu := range modules {
-		for _, modelModuleName := range modulesToLoad {
-			if modelModuleName == modu.Name {
-				moduleTemplates, err := a.ModuleLoader.LoadModuleTemplates(modu)
-				if err != nil {
-					return templatesForModules, errors.WithStack(err)
-				}
-
-				templatesForModules = append(templatesForModules, moduleTemplates)
-			}
-		}
-	}
-
-	return templatesForModules, nil
+	return modules, nil
 }

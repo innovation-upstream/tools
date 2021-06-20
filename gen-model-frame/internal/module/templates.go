@@ -5,7 +5,6 @@ import "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/int
 type (
 	ModuleTemplates struct {
 		Templates map[label.ModelFrameResourceLabel]TemplatesForFunctionType
-		Module    *ModelFrameModule
 	}
 
 	TemplatesForFunctionType struct {

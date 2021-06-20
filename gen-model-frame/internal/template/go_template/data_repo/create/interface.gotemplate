@@ -1,2 +1,0 @@
-Create(ctx context.Context, data *model.{{.ModCamel}}) error
-

@@ -13,9 +13,11 @@ import (
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/code_layer_generator"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/config"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/generator"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/label"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module/registry"
+	tmplRegistry "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/template/registry"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/transform"
 )
 
@@ -43,62 +45,78 @@ func (o *modelOut) OutputGenerated() error {
 	moduleLoader := module.NewModuleLoader(reg)
 	an := analyze.NewModelAnalyzer(o.Model, moduleLoader)
 
-	templatesForModules, err := an.GetModuleTemplates()
+	modules, err := an.GetModules()
 	if err != nil {
 		return errors.WithStack(err)
 	}
 
-	tr := transform.NewModelFramePathGoTemplateTransformer(&o.Model)
-	clg := code_layer_generator.NewTemplateHydrator(tr, templatesForModules)
-
-	gen := generator.NewModelFrameGenerator(o.Model, an, clg)
-	functionContent, err := gen.GenerateFrames()
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
-	if o.Config.OutputDirectory == "" {
-		raw, err := json.Marshal(functionContent)
+	var content []map[label.ModelFrameResourceLabel]code_layer_generator.ModuleCodeLayers
+	// todo: move this into another struct
+	tmplReg := tmplRegistry.NewFileSystemTemplateRegistry()
+	tmplLoader := module.NewTemplateLoader(modules, tmplReg)
+	for _, fp := range o.Model.FramePaths {
+		moduleTemplates, err := tmplLoader.LoadModuleTemplates(fp)
 		if err != nil {
 			return errors.WithStack(err)
 		}
 
-		os.Stdout.Write(raw)
-		return nil
+		tr := transform.NewModelFramePathGoTemplateTransformer(&o.Model)
+		clg := code_layer_generator.NewTemplateHydrator(tr, moduleTemplates)
+
+		gen := generator.NewModelFrameGenerator(clg)
+		framePathContent, err := gen.GenerateFrames(fp)
+		if err != nil {
+			return errors.WithStack(err)
+		}
+
+		content = append(content, framePathContent)
 	}
 
-	var sb strings.Builder
-	for _, v := range functionContent {
-		for moduleName, moduleContent := range v {
-			for layer, moduleContent := range moduleContent {
-				sb.Reset()
+	for _, c := range content {
+		// if there is no out dir, dump to stdout
+		if o.Config.OutputDirectory == "" {
+			raw, err := json.Marshal(c)
+			if err != nil {
+				return errors.WithStack(err)
+			}
 
-				strLayer := layer.GetFileFriendlyName()
+			os.Stdout.Write(raw)
+			return nil
+		}
 
-				baseDirOverride := o.Model.Output.Directory
-				if baseDirOverride != "" {
-					sb.WriteString(baseDirOverride)
+		var sb strings.Builder
+		for _, v := range c {
+			for moduleName, moduleContent := range v {
+				for layer, moduleContent := range moduleContent {
+					sb.Reset()
+
+					strLayer := layer.GetFileFriendlyName()
+
+					baseDirOverride := o.Model.Output.Directory
+					if baseDirOverride != "" {
+						sb.WriteString(baseDirOverride)
+						sb.WriteRune('/')
+					}
+
+					sb.WriteString(o.Config.OutputDirectory)
 					sb.WriteRune('/')
-				}
+					sb.WriteString(o.Model.Name)
+					sb.WriteRune('/')
+					sb.WriteString(strLayer)
 
-				sb.WriteString(o.Config.OutputDirectory)
-				sb.WriteRune('/')
-				sb.WriteString(o.Model.Name)
-				sb.WriteRune('/')
-				sb.WriteString(strLayer)
+					outDir := sb.String()
+					err = os.MkdirAll(outDir, 0755)
+					if err != nil {
+						return errors.WithStack(err)
+					}
 
-				outDir := sb.String()
-				err = os.MkdirAll(outDir, 0755)
-				if err != nil {
-					return errors.WithStack(err)
-				}
+					sb.WriteRune('/')
+					sb.WriteString(fmt.Sprintf("%s.go", moduleName))
 
-				sb.WriteRune('/')
-				sb.WriteString(fmt.Sprintf("%s.go", moduleName))
-
-				err = ioutil.WriteFile(sb.String(), []byte(moduleContent), fs.FileMode(0644))
-				if err != nil {
-					return errors.WithStack(err)
+					err = ioutil.WriteFile(sb.String(), []byte(moduleContent), fs.FileMode(0644))
+					if err != nil {
+						return errors.WithStack(err)
+					}
 				}
 			}
 		}

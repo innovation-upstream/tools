@@ -16,48 +16,44 @@ import (
 )
 
 type templateHydrator struct {
-	transform           transform.ModelFramePathGoTemplateTransformer
-	TemplatesForModules []*module.ModuleTemplates
+	transform             transform.ModelFramePathGoTemplateTransformer
+	TemplatesForFramePath *module.ModuleTemplates
 }
 
-func NewTemplateHydrator(transform transform.ModelFramePathGoTemplateTransformer, TemplatesForModules []*module.ModuleTemplates) CodeLayerGenerator {
+func NewTemplateHydrator(transform transform.ModelFramePathGoTemplateTransformer, TemplatesForModules *module.ModuleTemplates) CodeLayerGenerator {
 	return &templateHydrator{
-		transform:           transform,
-		TemplatesForModules: TemplatesForModules,
+		transform:             transform,
+		TemplatesForFramePath: TemplatesForModules,
 	}
 }
 
 func (g *templateHydrator) GenerateCodeLayersForFramePath(framePath model_frame_path.ModelFramePath) (ModuleCodeLayers, error) {
 	out := make(ModuleCodeLayers)
 
-	for _, m := range g.TemplatesForModules {
-		hydratedTemplatesForModuleLayers, err := g.hydrateModuleTemplates(framePath, m)
-		if err != nil {
-			return out, errors.WithStack(err)
-		}
-
-		moduleName := m.Module.Name.GetFileFriendlyName()
-
-		out[moduleName] = hydratedTemplatesForModuleLayers
+	hydratedTemplatesForModuleLayers, err := g.hydrateModuleTemplates(framePath, g.TemplatesForFramePath)
+	if err != nil {
+		return out, errors.WithStack(err)
 	}
+
+	fpOutDirName := framePath.Function.GetFileFriendlyName()
+
+	out[fpOutDirName] = hydratedTemplatesForModuleLayers
 
 	return out, nil
 }
 
 func (g *templateHydrator) hydrateModuleTemplates(framePath model_frame_path.ModelFramePath, m *module.ModuleTemplates) (map[label.ModelFrameResourceLabel]string, error) {
 	templatesForModuleLayers := make(map[label.ModelFrameResourceLabel]string)
-	templatesForFunction := m.GetTemplatesForFunctionLabel(framePath.FunctionType)
 	tmplData := g.transform.ModelFramePathToBasicTemplateInputPtr(framePath)
+	layerTemplates := m.Templates[framePath.Function]
 
-	for _, l := range framePath.Layers {
-		templatesForLayer := templatesForFunction.LayerTemplates[l]
-
-		layerTmplSections, err := g.hydrateLayerTemplates(templatesForLayer, tmplData, l)
+	for l, templatesForLayer := range layerTemplates.LayerTemplates {
+		layerTmplSections, err := g.hydrateLayerTemplates(templatesForLayer, tmplData)
 		if err != nil {
 			return templatesForModuleLayers, errors.WithStack(err)
 		}
 
-		layoutTemplate := templatesForFunction.LayoutTemplates[l]
+		layoutTemplate := layerTemplates.LayoutTemplates[l]
 		t := template.Must(
 			template.New(fmt.Sprintf("layout_%s", l)).Funcs(sprig.TxtFuncMap()).Parse(layoutTemplate),
 		)
@@ -75,11 +71,11 @@ func (g *templateHydrator) hydrateModuleTemplates(framePath model_frame_path.Mod
 }
 
 // TODO: move this to a layer hydrator struct
-func (g *templateHydrator) hydrateLayerTemplates(templatesForLayer module.TemplatesForLayer, tmplData *model.BasicTemplateInput, layerLabel label.ModelFrameResourceLabel) (map[string]string, error) {
+func (g *templateHydrator) hydrateLayerTemplates(templatesForLayer module.TemplatesForLayer, tmplData *model.BasicTemplateInput) (map[string]string, error) {
 	hydratedLayerSections := make(map[string]string)
 
 	for section, tmpl := range templatesForLayer.SectionTemplates {
-		trimmedOut, err := g.hydrateLayerSectionTemplate(tmpl, tmplData, layerLabel, section)
+		trimmedOut, err := g.hydrateLayerSectionTemplate(tmpl, tmplData, section)
 		if err != nil {
 			return hydratedLayerSections, errors.WithStack(err)
 		}
@@ -91,11 +87,11 @@ func (g *templateHydrator) hydrateLayerTemplates(templatesForLayer module.Templa
 }
 
 // TODO: move this to a section hydrator struct
-func (g *templateHydrator) hydrateLayerSectionTemplate(tmpl string, data *model.BasicTemplateInput, layerLabel label.ModelFrameResourceLabel, sectionLabel label.ModelFrameResourceLabel) (string, error) {
+func (g *templateHydrator) hydrateLayerSectionTemplate(tmpl string, data *model.BasicTemplateInput, sectionLabel label.ModelFrameResourceLabel) (string, error) {
 	var hydratedSection string
 
 	t := template.Must(
-		template.New(fmt.Sprintf("tmpl_%s_%s", layerLabel, sectionLabel)).Funcs(sprig.TxtFuncMap()).Parse(tmpl),
+		template.New(fmt.Sprintf("tmpl_%s", sectionLabel)).Funcs(sprig.TxtFuncMap()).Parse(tmpl),
 	)
 	var buff bytes.Buffer
 	err := t.Execute(&buff, data)
