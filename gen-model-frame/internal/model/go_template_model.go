@@ -9,6 +9,7 @@ type (
 		ReferenceTypeCamel      string
 		ReferenceTypeLowerCamel string
 		MetaData                map[string]string
+		Options                 ModelOptions
 	}
 
 	GoBasicLayoutTemplateInput struct {

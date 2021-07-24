@@ -33,6 +33,7 @@ func (t *modelFramePathGoTemplateTransformer) ModelFramePathToBasicTemplateInput
 		ReferenceTypeCamel:      strcase.ToCamel(string(fp.ReferenceType)),
 		ReferenceTypeLowerCamel: strcase.ToLowerCamel(string(fp.ReferenceType)),
 		MetaData:                t.model.MetaData,
+		Options:                 t.model.Options,
 	}
 }
 

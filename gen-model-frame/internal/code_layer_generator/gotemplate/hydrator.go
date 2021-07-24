@@ -1,4 +1,4 @@
-package code_layer_generator
+package gotemplate
 
 import (
 	"bytes"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/Masterminds/sprig"
 	"github.com/pkg/errors"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/code_layer_generator"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/label"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model_frame_path"
@@ -20,15 +21,15 @@ type templateHydrator struct {
 	TemplatesForFramePath *module.ModuleTemplates
 }
 
-func NewTemplateHydrator(transform transform.ModelFramePathGoTemplateTransformer, TemplatesForModules *module.ModuleTemplates) CodeLayerGenerator {
+func NewTemplateHydrator(transform transform.ModelFramePathGoTemplateTransformer, TemplatesForModules *module.ModuleTemplates) code_layer_generator.CodeLayerGenerator {
 	return &templateHydrator{
 		transform:             transform,
 		TemplatesForFramePath: TemplatesForModules,
 	}
 }
 
-func (g *templateHydrator) GenerateCodeLayersForFramePath(framePath model_frame_path.ModelFramePath) (ModuleCodeLayers, error) {
-	out := make(ModuleCodeLayers)
+func (g *templateHydrator) GenerateCodeLayersForFramePath(framePath model_frame_path.ModelFramePath) (code_layer_generator.ModuleCodeLayers, error) {
+	out := make(code_layer_generator.ModuleCodeLayers)
 
 	hydratedTemplatesForModuleLayers, err := g.hydrateModuleTemplates(framePath, g.TemplatesForFramePath)
 	if err != nil {
@@ -55,7 +56,9 @@ func (g *templateHydrator) hydrateModuleTemplates(framePath model_frame_path.Mod
 
 		layoutTemplate := layerTemplates.LayoutTemplates[l]
 		t := template.Must(
-			template.New(fmt.Sprintf("layout_%s", l)).Funcs(sprig.TxtFuncMap()).Parse(layoutTemplate),
+			template.New(fmt.Sprintf("layout_%s", l)).
+				Funcs(sprig.TxtFuncMap()).
+				Parse(layoutTemplate),
 		)
 		var buff bytes.Buffer
 		layoutTmplData := g.transform.LayerSectionsToGoBasicLayoutTemplateInputPtr(*tmplData, layerTmplSections)
@@ -91,7 +94,9 @@ func (g *templateHydrator) hydrateLayerSectionTemplate(tmpl string, data *model.
 	var hydratedSection string
 
 	t := template.Must(
-		template.New(fmt.Sprintf("tmpl_%s", sectionLabel)).Funcs(sprig.TxtFuncMap()).Parse(tmpl),
+		template.New(fmt.Sprintf("tmpl_%s", sectionLabel)).
+			Funcs(sprig.TxtFuncMap()).
+			Parse(tmpl),
 	)
 	var buff bytes.Buffer
 	err := t.Execute(&buff, data)

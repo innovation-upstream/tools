@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/analyze"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/code_layer_generator"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/code_layer_generator/gotemplate"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/config"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/generator"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/label"
@@ -61,7 +62,7 @@ func (o *modelOut) OutputGenerated() error {
 		}
 
 		tr := transform.NewModelFramePathGoTemplateTransformer(&o.Model)
-		clg := code_layer_generator.NewTemplateHydrator(tr, moduleTemplates)
+		clg := gotemplate.NewTemplateHydrator(tr, moduleTemplates)
 
 		gen := generator.NewModelFrameGenerator(clg)
 		framePathContent, err := gen.GenerateFrames(fp)
