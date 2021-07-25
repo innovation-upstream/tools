@@ -25,43 +25,42 @@ func NewTemplateLoader(modules []*ModelFrameModule, registry registry.TemplateRe
 	}
 }
 
-func (loader *templateLoader) LoadLayerTemplates(modelFunction label.ModelFrameResourceLabel, l ModelLayer) (TemplatesForLayer, string, error) {
+func (loader *templateLoader) LoadLayerTemplates(l ModelLayer) (TemplatesForLayer, error) {
 	var layerLayoutTmpl string
 	var templatesForLayer TemplatesForLayer
 
-	sectionTemplates := make(map[label.ModelFrameResourceLabel]string)
-	for _, s := range l.Sections {
-		sectionTmpl, err := loader.registry.LoadSectionTemplate(modelFunction, l.Label, s.Label)
-		if err != nil {
-			return templatesForLayer, layerLayoutTmpl, errors.WithStack(err)
-		}
-
-		sectionTemplates[s.Label] = sectionTmpl
+	sectionTemplates, err := loader.registry.LoadTemplateForAllSections(l.Label)
+	if err != nil {
+		return templatesForLayer, errors.WithStack(err)
 	}
 
-	layerLayoutTmpl, err := loader.registry.LoadLayerLayoutTemplate(l.Label)
+	layerLayoutTmpl, err = loader.registry.LoadLayerLayoutTemplate(l.Label)
 	if err != nil {
-		return templatesForLayer, layerLayoutTmpl, errors.WithStack(err)
+		return templatesForLayer, errors.WithStack(err)
 	}
 
 	templatesForLayer = TemplatesForLayer{
 		SectionTemplates: sectionTemplates,
+		LayoutTemplate:   layerLayoutTmpl,
 	}
 
-	return templatesForLayer, layerLayoutTmpl, nil
+	return templatesForLayer, nil
 }
 
 func (loader *templateLoader) getDependancyLayersToLoad(l ModelLayer) []ModelLayer {
 	var layersToLoad []ModelLayer
 
+	layersToLoad = append(layersToLoad, l)
+
 	for _, d := range l.Deps {
-		// find the layer that dep refs
+		// find the layer for dep
 		for _, am := range loader.modules {
-			for _, al := range am.Layers {
-				if al.Label == d.Label {
-					layersToLoad = append(layersToLoad, al)
-					depLayersToLoad := loader.getDependancyLayersToLoad(al)
-					layersToLoad = append(layersToLoad, depLayersToLoad...)
+			if am.Name.GetNamespace() == d.Label.GetNamespace() {
+				for _, al := range am.Layers {
+					if al.Label == d.Label {
+						depLayersToLoad := loader.getDependancyLayersToLoad(al)
+						layersToLoad = append(layersToLoad, depLayersToLoad...)
+					}
 				}
 			}
 		}
@@ -72,42 +71,49 @@ func (loader *templateLoader) getDependancyLayersToLoad(l ModelLayer) []ModelLay
 
 func (loader *templateLoader) LoadModuleTemplates(fp model_frame_path.ModelFramePath) (*ModuleTemplates, error) {
 	var mod ModuleTemplates
-	templates := make(map[label.ModelFrameResourceLabel]TemplatesForFunctionType)
+	var templates []TemplatesForLayers
 
-	f := fp.Function
-	var layersToLoad []ModelLayer
+	var allLayersToLoad []ModelLayer
+	// find the layer entrypoints to build our dep tree from
 	for _, l := range fp.Layers {
-		// get the layer struct instance for the frame path layer ref
 		for _, m := range loader.modules {
 			if m.Name.GetNamespace() == l.GetNamespace() {
 				for _, ml := range m.Layers {
 					if ml.Label == l {
-						layerDepLayers := loader.getDependancyLayersToLoad(ml)
-						layersToLoad = append(layersToLoad, ml)
-						layersToLoad = append(layersToLoad, layerDepLayers...)
+						depLayers := loader.getDependancyLayersToLoad(ml)
+						allLayersToLoad = append(allLayersToLoad, depLayers...)
 					}
 				}
 			}
 		}
 	}
 
-	var funcTemplates TemplatesForFunctionType
+	// De-dupe layers
+	var layersToLoad []ModelLayer
+all:
+	for _, al := range allLayersToLoad {
+		for _, l := range layersToLoad {
+			if l.Label == al.Label {
+				continue all
+			}
+		}
+		layersToLoad = append(layersToLoad, al)
+	}
+
+	var templatesForLayers TemplatesForLayers
 	layerTemplates := make(map[label.ModelFrameResourceLabel]TemplatesForLayer)
-	layoutTemplates := make(map[label.ModelFrameResourceLabel]string)
 
 	for _, l := range layersToLoad {
-		tmpltesForLayer, layerLayoutTmpl, err := loader.LoadLayerTemplates(f, l)
+		tmpltesForLayer, err := loader.LoadLayerTemplates(l)
 		if err != nil {
 			return &mod, errors.WithStack(err)
 		}
 
 		layerTemplates[l.Label] = tmpltesForLayer
-		layoutTemplates[l.Label] = layerLayoutTmpl
 	}
 
-	funcTemplates.LayoutTemplates = layoutTemplates
-	funcTemplates.LayerTemplates = layerTemplates
-	templates[f] = funcTemplates
+	templatesForLayers.LayerTemplates = layerTemplates
+	templates = append(templates, templatesForLayers)
 
 	mod = ModuleTemplates{
 		Templates: templates,

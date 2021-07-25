@@ -124,23 +124,9 @@ func Test_moduleLoader_LoadAllModulesFromDirectory(t *testing.T) {
 
 	mModule := &ModelFrameModule{
 		Name: "@builtin/golang-api",
-		Functions: []ModelFunction{
-			{
-				Label: "create",
-			},
-		},
 		Layers: []ModelLayer{
 			{
-				Label:     "data-logic",
-				Functions: []ModelFunctionLabel{"@builtin/golang-api::create"},
-				Sections: []ModelSection{
-					{
-						Label: "interface-definition",
-					},
-					{
-						Label: "method",
-					},
-				},
+				Label: "data-logic",
 			},
 		},
 	}

@@ -14,7 +14,6 @@ import (
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/code_layer_generator/gotemplate"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/config"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/generator"
-	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/label"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module/registry"
@@ -51,7 +50,7 @@ func (o *modelOut) OutputGenerated() error {
 		return errors.WithStack(err)
 	}
 
-	var content []map[label.ModelFrameResourceLabel]code_layer_generator.ModuleCodeLayers
+	var content [][]code_layer_generator.CodeLayers
 	// todo: move this into another struct
 	tmplReg := tmplRegistry.NewFileSystemTemplateRegistry()
 	tmplLoader := module.NewTemplateLoader(modules, tmplReg)
@@ -87,37 +86,35 @@ func (o *modelOut) OutputGenerated() error {
 
 		var sb strings.Builder
 		for _, v := range c {
-			for moduleName, moduleContent := range v {
-				for layer, moduleContent := range moduleContent {
-					sb.Reset()
+			for layer, codeLayerContent := range v {
+				sb.Reset()
 
-					strLayer := layer.GetFileFriendlyName()
+				strLayer := layer.GetFileFriendlyName()
 
-					baseDirOverride := o.Model.Output.Directory
-					if baseDirOverride != "" {
-						sb.WriteString(baseDirOverride)
-						sb.WriteRune('/')
-					}
-
-					sb.WriteString(o.Config.OutputDirectory)
+				baseDirOverride := o.Model.Output.Directory
+				if baseDirOverride != "" {
+					sb.WriteString(baseDirOverride)
 					sb.WriteRune('/')
-					sb.WriteString(o.Model.Name)
-					sb.WriteRune('/')
-					sb.WriteString(strLayer)
+				}
 
-					outDir := sb.String()
-					err = os.MkdirAll(outDir, 0755)
-					if err != nil {
-						return errors.WithStack(err)
-					}
+				sb.WriteString(o.Config.OutputDirectory)
+				sb.WriteRune('/')
+				sb.WriteString(string(o.Model.Label))
+				sb.WriteRune('/')
+				sb.WriteString(strLayer)
 
-					sb.WriteRune('/')
-					sb.WriteString(fmt.Sprintf("%s.go", moduleName))
+				outDir := sb.String()
+				err = os.MkdirAll(outDir, 0755)
+				if err != nil {
+					return errors.WithStack(err)
+				}
 
-					err = ioutil.WriteFile(sb.String(), []byte(moduleContent), fs.FileMode(0644))
-					if err != nil {
-						return errors.WithStack(err)
-					}
+				sb.WriteRune('/')
+				sb.WriteString(fmt.Sprintf("%s.go", layer.GetFileFriendlyName()))
+
+				err = ioutil.WriteFile(sb.String(), []byte(codeLayerContent), fs.FileMode(0644))
+				if err != nil {
+					return errors.WithStack(err)
 				}
 			}
 		}

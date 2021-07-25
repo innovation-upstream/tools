@@ -6,8 +6,5 @@ import "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/int
 // each other
 // Can be used to generate a chain of related functions (io, logic, data)
 type ModelFramePath struct {
-	Function label.ModelFrameResourceLabel `json:"function"`
-	// What reference is used in this frame path
-	ReferenceType ReferenceType                   `json:"referenceType"`
-	Layers        []label.ModelFrameResourceLabel `json:"layers"`
+	Layers []label.ModelFrameResourceLabel `json:"layers"`
 }

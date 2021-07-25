@@ -1,6 +1,7 @@
 package label
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -43,4 +44,17 @@ func (n ModelFrameResourceLabel) GetFileFriendlyName() string {
 	moduleName = reColon.ReplaceAllString(moduleName, "_")
 
 	return moduleName
+}
+
+func NameToModelFrameResourceLabel(ns string, resourceType string, name string) ModelFrameResourceLabel {
+	var label ModelFrameResourceLabel
+
+	isAlreadyQualified := ModelFrameResourceLabelPattern.MatchString(string(name))
+	if isAlreadyQualified {
+		return ModelFrameResourceLabel(name)
+	}
+
+	label = ModelFrameResourceLabel(fmt.Sprintf("%s::%s/%s", ns, resourceType, name))
+
+	return label
 }

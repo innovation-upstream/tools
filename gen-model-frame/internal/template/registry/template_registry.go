@@ -4,7 +4,7 @@ import "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/int
 
 type (
 	TemplateRegistry interface {
-		LoadSectionTemplate(functionLabel label.ModelFrameResourceLabel, layerLabel label.ModelFrameResourceLabel, sectionLabel label.ModelFrameResourceLabel) (string, error)
+		LoadTemplateForAllSections(layerLabel label.ModelFrameResourceLabel) (map[label.ModelFrameResourceLabel]string, error)
 		LoadLayerLayoutTemplate(layerLabel label.ModelFrameResourceLabel) (string, error)
 	}
 )

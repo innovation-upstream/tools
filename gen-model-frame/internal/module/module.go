@@ -10,8 +10,6 @@ type (
 	ModelFrameModule struct {
 		// Name is the fully-qualified name of this module
 		Name label.ModelFrameResourceLabel `json:"name"`
-		// Functions is the list of functions defined by this module
-		Functions []ModelFunction `json:"functions"`
 		// Layers is the list of layers defined by this module
 		Layers []ModelLayer `json:"layers"`
 	}
@@ -26,10 +24,7 @@ type (
 
 	ModelLayer struct {
 		Label label.ModelFrameResourceLabel `json:"label"`
-		// Functions is the list of functions this layer can implement
-		Functions []ModelLayerFunctionRef `json:"functions"`
-		Sections  []ModelSection          `json:"sections"`
-		Deps      []ModelLayerModuleDep   `json:"deps"`
+		Deps  []ModelLayerModuleDep         `json:"deps"`
 	}
 
 	ModelLayerFunctionRef struct {
@@ -63,36 +58,12 @@ func (m ModelFrameModule) FullyQualifyLabels() ModelFrameModule {
 			q.Layers[i].Label = fql
 		}
 
-		for si, s := range l.Sections {
-			secLabelIsQualified := label.ModelFrameResourceLabelPattern.MatchString(string(s.Label))
-			if secLabelIsQualified == false {
-				sfql := label.ModelFrameResourceLabel(fmt.Sprintf("%s::%s/%s", q.Name, "section", s.Label))
-				q.Layers[i].Sections[si].Label = sfql
-			}
-		}
-
 		for di, d := range l.Deps {
 			secLabelIsQualified := label.ModelFrameResourceLabelPattern.MatchString(string(d.Label))
 			if secLabelIsQualified == false {
 				dfql := label.ModelFrameResourceLabel(fmt.Sprintf("%s::%s/%s", q.Name, "layer", d.Label))
 				q.Layers[i].Deps[di].Label = dfql
 			}
-		}
-
-		for fi, l := range l.Functions {
-			secLabelIsQualified := label.ModelFrameResourceLabelPattern.MatchString(string(l.Label))
-			if secLabelIsQualified == false {
-				ffql := label.ModelFrameResourceLabel(fmt.Sprintf("%s::%s/%s", q.Name, "function", l.Label))
-				q.Layers[i].Functions[fi].Label = ffql
-			}
-		}
-	}
-
-	for fi, f := range q.Functions {
-		functionLabelIsQualified := label.ModelFrameResourceLabelPattern.MatchString(string(f.Label))
-		if functionLabelIsQualified == false {
-			ffql := label.ModelFrameResourceLabel(fmt.Sprintf("%s::%s/%s", q.Name, "function", f.Label))
-			q.Functions[fi].Label = ffql
 		}
 	}
 

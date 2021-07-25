@@ -24,16 +24,13 @@ func NewModelFramePathGoTemplateTransformer(model *model.Model) ModelFramePathGo
 }
 
 func (t *modelFramePathGoTemplateTransformer) ModelFramePathToBasicTemplateInputPtr(fp model_frame_path.ModelFramePath) *model.BasicTemplateInput {
-	n := t.model.Name
+	n := t.model.Label
 	return &model.BasicTemplateInput{
-		ModCamel:                strcase.ToCamel(n),
-		ModLowerCamel:           strcase.ToLowerCamel(n),
-		ModSnake:                strcase.ToSnake(n),
-		ModKebab:                strcase.ToKebab(n),
-		ReferenceTypeCamel:      strcase.ToCamel(string(fp.ReferenceType)),
-		ReferenceTypeLowerCamel: strcase.ToLowerCamel(string(fp.ReferenceType)),
-		MetaData:                t.model.MetaData,
-		Options:                 t.model.Options,
+		ModCamel:      strcase.ToCamel(n.GetName()),
+		ModLowerCamel: strcase.ToLowerCamel(n.GetName()),
+		ModSnake:      strcase.ToSnake(n.GetName()),
+		ModKebab:      strcase.ToKebab(n.GetName()),
+		Options:       t.model.Options,
 	}
 }
 

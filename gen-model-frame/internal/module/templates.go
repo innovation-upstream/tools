@@ -4,19 +4,15 @@ import "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/int
 
 type (
 	ModuleTemplates struct {
-		Templates map[label.ModelFrameResourceLabel]TemplatesForFunctionType
+		Templates []TemplatesForLayers
 	}
 
-	TemplatesForFunctionType struct {
-		LayerTemplates  map[label.ModelFrameResourceLabel]TemplatesForLayer
-		LayoutTemplates map[label.ModelFrameResourceLabel]string
+	TemplatesForLayers struct {
+		LayerTemplates map[label.ModelFrameResourceLabel]TemplatesForLayer
 	}
 
 	TemplatesForLayer struct {
 		SectionTemplates map[label.ModelFrameResourceLabel]string
+		LayoutTemplate   string
 	}
 )
-
-func (r *ModuleTemplates) GetTemplatesForFunctionLabel(funcType label.ModelFrameResourceLabel) TemplatesForFunctionType {
-	return r.Templates[funcType]
-}
