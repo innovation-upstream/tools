@@ -1,0 +1,51 @@
+package logic
+
+{{$golangAPIModuleOptions := index .Basic.Options.module "@well-known/golang-api"}}
+
+{{- $pkgPath := $golangAPIModuleOptions.golang.packagePath -}}
+
+{{- $logicPkgPath := $golangAPIModuleOptions.golang.logicPackagePath -}}
+{{- $repoPkgPath := $golangAPIModuleOptions.golang.repoPackagePath -}}
+
+{{- $modelPkgPath := $golangAPIModuleOptions.golang.modelPackagePath -}}
+
+{{- $useRBAC := eq $golangAPIModuleOptions.runtime.accessControl "rbac" -}}
+{{- $rbacFieldPkgPath := $golangAPIModuleOptions.golang.rbacFieldPackagePath -}}
+{{- $rbacModelPkgPath := $golangAPIModuleOptions.golang.rbacModelPackagePath -}}
+
+import (
+  "context"
+
+  {{- if $useRBAC}}
+  rbacField "{{$rbacFieldPkgPath}}"
+  rbacModel "{{$rbacModelPkgPath}}"
+  identity "gitlab.innovationup.stream/innovation-upstream/api-frame/service/identity"
+  {{- end}}
+  "github.com/pkg/errors"
+  model "{{$modelPkgPath}}"
+  "{{$repoPkgPath}}"
+  "google.golang.org/grpc/codes"
+  "google.golang.org/grpc/status"
+  {{.Sections.import}}
+)
+
+type {{.Basic.ModCamel}}Logic interface {
+  {{.Sections.interface}}
+}
+
+type {{.Basic.ModLowerCamel}}Logic struct {
+  repo          repo.{{.Basic.ModCamel}}Repo
+  accessControl identity.AccessControl
+  uuid          helpers.UUID
+}
+
+func New{{.Basic.ModCamel}}Logic(repo repo.{{.Basic.ModCamel}}Repo, accessControl identity.AccessControl, uuid helpers.UUID) {{.Basic.ModCamel}}Logic {
+  p := &{{.Basic.ModLowerCamel}}Logic{
+    repo:          repo,
+    accessControl: accessControl,
+    uuid:          uuid,
+  }
+  return p
+}
+
+{{.Sections.method}}

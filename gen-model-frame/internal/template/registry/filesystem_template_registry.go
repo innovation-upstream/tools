@@ -25,7 +25,7 @@ func (l *fsTemplateRegistry) LoadTemplateForAllSections(layerLabel label.ModelFr
 	f, err := os.Open(sectionsDirPath)
 	if err != nil {
 		if _, ok := err.(*os.PathError); ok {
-			clog.Info("Skipping loading section templates for %s (no sections dir found)", layerLabel)
+			clog.Trace("Skipping loading section templates for %s (no sections dir found)", layerLabel)
 			return tmpls, nil
 		}
 		return tmpls, errors.WithStack(err)

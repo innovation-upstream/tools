@@ -1,0 +1,42 @@
+[
+  {
+    "name": "@mimobl/AppointmentRequest",
+    "framePaths": [
+      {
+        "layers": [
+          "@well-known/golang-api::layer/logic-repo",
+          "@well-known/golang-api::layer/io-grpc",
+          "@well-known/golang-api::layer/init"
+        ]
+      }
+    ],
+    "options": {
+      "module": {
+        "@well-known/golang-api": {
+          "api": {
+            "deps": ["@mimobl/Appointment"]
+          },
+          "golang": {
+            "packagePath": "gitlab.com/mobl-dev/service/appointment-request/appointment-request",
+            "repoPackagePath": "gitlab.com/mobl-dev/service/appointment-request/appointment-request/internal/repo",
+            "logicPackagePath": "gitlab.com/mobl-dev/service/appointment-request/appointment-request/internal/logic",
+            "ioPackagePath": "gitlab.com/mobl-dev/service/appointment-request/appointment-request/internal/rpc",
+            "modelPackagePath": "gitlab.com/mobl-dev/model/appointment-request/appointment-request",
+            "rbacPackagePath": "gitlab.com/mobl-dev/rbac",
+            "identityPackagePath": "gitlab.innovationup.stream/innovation-upstream/api-frame/service/identity",
+            "rbacFieldPackagePath": "gitlab.com/mobl-dev/rbac/field/appointment-request/appointment-request",
+            "rbacModelPackagePath": "gitlab.com/mobl-dev/rbac/model/appointment-request/appointment-request",
+            "topicPackagePath": "gitlab.com/mobl-dev/broadcast/topic/appointment/appointment-request",
+            "pubsubClientFactoryPackagePath": "gitlab.com/mobl-dev/factory/client/pubsub",
+            "uuidHelpersPackagePath": "gitlab.com/mobl-dev/helpers/uuid",
+            "relayBasePackagePath": "gitlab.com/mobl-dev/relay"
+          },
+          "runtime": {
+            "accessControl": "rbac",
+            "broadcast": "true"
+          }
+        }
+      }
+    }
+  }
+]

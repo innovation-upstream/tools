@@ -1,0 +1,8 @@
+func (r *{{.ModLowerCamel}}Repo) Create(ctx context.Context, data []*model.{{.ModCamel}}) error {
+  err := r.storage.CreateOne(ctx, data)
+  if err != nil {
+    return errors.WithStack(err)
+  }
+
+  return nil
+}

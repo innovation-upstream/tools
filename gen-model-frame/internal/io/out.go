@@ -2,11 +2,10 @@ package io
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"os"
-	"strings"
+	"path"
 
 	"github.com/pkg/errors"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/analyze"
@@ -14,6 +13,8 @@ import (
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/code_layer_generator/gotemplate"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/config"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/generator"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/io/out/target"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/label"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module/registry"
@@ -84,35 +85,19 @@ func (o *modelOut) OutputGenerated() error {
 			return nil
 		}
 
-		var sb strings.Builder
+		outTarget := target.NewFileSystemOutputTarget(o.Config.OutputDirectory, o.Model.Label)
 		for _, v := range c {
-			for layer, codeLayerContent := range v {
-				sb.Reset()
+			for layerLbl, codeLayerContent := range v {
+				layer := searchForModelLayer(modules, layerLbl)
 
-				strLayer := layer.GetFileFriendlyName()
-
-				baseDirOverride := o.Model.Output.Directory
-				if baseDirOverride != "" {
-					sb.WriteString(baseDirOverride)
-					sb.WriteRune('/')
-				}
-
-				sb.WriteString(o.Config.OutputDirectory)
-				sb.WriteRune('/')
-				sb.WriteString(string(o.Model.Label))
-				sb.WriteRune('/')
-				sb.WriteString(strLayer)
-
-				outDir := sb.String()
-				err = os.MkdirAll(outDir, 0755)
+				layerFilePath := outTarget.GetLayerOutputPath(layer.File)
+				dir, _ := path.Split(layerFilePath)
+				err := os.MkdirAll(dir, 0755)
 				if err != nil {
 					return errors.WithStack(err)
 				}
 
-				sb.WriteRune('/')
-				sb.WriteString(fmt.Sprintf("%s.go", layer.GetFileFriendlyName()))
-
-				err = ioutil.WriteFile(sb.String(), []byte(codeLayerContent), fs.FileMode(0644))
+				err = ioutil.WriteFile(layerFilePath, []byte(codeLayerContent), fs.FileMode(0644))
 				if err != nil {
 					return errors.WithStack(err)
 				}
@@ -121,4 +106,20 @@ func (o *modelOut) OutputGenerated() error {
 	}
 
 	return nil
+}
+
+func searchForModelLayer(modules []*module.ModelFrameModule, lbl label.ModelFrameResourceLabel) *module.ModelLayer {
+	if len(modules) == 0 {
+		return nil
+	}
+
+	head := modules[0]
+	tail := modules[1:]
+
+	layer := head.GetLayerByLabel(lbl)
+	if layer == nil {
+		layer = searchForModelLayer(tail, lbl)
+	}
+
+	return layer
 }

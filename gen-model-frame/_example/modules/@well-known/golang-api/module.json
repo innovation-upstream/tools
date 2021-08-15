@@ -1,0 +1,35 @@
+{
+  "name": "@well-known/golang-api",
+  "layers": [
+    {
+      "label": "data-repo",
+      "file": {
+        "pathTemplate": "internal/repo/[modelNameSnake].go"
+      }
+    },
+    {
+      "label": "logic-repo",
+      "file": {
+        "pathTemplate": "internal/logic/[modelNameSnake].go"
+      },
+      "deps": [
+        {
+          "label": "@well-known/golang-api::layer/data-repo"
+        }
+      ]
+    },
+    {
+      "label": "io-grpc",
+      "file": {
+        "pathTemplate": "internal/rpc/handler.go"
+      }
+    },
+    {
+      "label": "init",
+      "file": {
+        "pathTemplate": "main.go"
+      }
+    }
+  ]
+}
+

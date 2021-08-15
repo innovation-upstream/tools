@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	gmfRegexp "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/regexp"
 )
 
 type ModelFrameResourceLabel string
-
-var ModelFrameResourceLabelPattern = regexp.MustCompile(`^(@[A-Za-z-_]+\/)?[A-Za-z-_]+::(((function)|(section)|(layer))+\/)[A-Za-z-_]+$`)
 
 // GetNamespace returns the namespace represented in the label.
 // e.g. "@innovation-updatem/golang-api" "golang-api"
@@ -49,7 +49,7 @@ func (n ModelFrameResourceLabel) GetFileFriendlyName() string {
 func NameToModelFrameResourceLabel(ns string, resourceType string, name string) ModelFrameResourceLabel {
 	var label ModelFrameResourceLabel
 
-	isAlreadyQualified := ModelFrameResourceLabelPattern.MatchString(string(name))
+	isAlreadyQualified := gmfRegexp.ModelFrameResourceLabelPattern.MatchString(string(name))
 	if isAlreadyQualified {
 		return ModelFrameResourceLabel(name)
 	}

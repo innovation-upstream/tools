@@ -10,12 +10,7 @@ type (
 	Model struct {
 		Label      ModelLabel                        `json:"name"`
 		FramePaths []model_frame_path.ModelFramePath `json:"framePaths"`
-		Output     ModelOutput                       `json:"output"`
 		Options    ModelOptions                      `json:"options"`
-	}
-
-	ModelOutput struct {
-		Directory string `json:"directory"`
 	}
 
 	ModelLabel string

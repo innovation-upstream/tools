@@ -1,0 +1,86 @@
+package main
+
+{{- $golangAPIModuleOptions := index .Basic.Options.module "@well-known/golang-api"}}
+
+{{- $pkgPath := $golangAPIModuleOptions.golang.packagePath -}}
+{{- $ioPkgPath := $golangAPIModuleOptions.golang.ioPackagePath -}}
+
+{{- $useRBAC := eq $golangAPIModuleOptions.runtime.accessControl "rbac" -}}
+{{- $rbacPkgPath := $golangAPIModuleOptions.golang.rbacPackagePath -}}
+{{- $identityPkgPath := $golangAPIModuleOptions.golang.identityPackagePath -}}
+
+{{- $useBroadcast := eq $golangAPIModuleOptions.runtime.broadcast "true" -}}
+{{- $pubsubClientPkgPath := $golangAPIModuleOptions.golang.pubsubClientPackagePath -}}
+{{- $topicPkgPath := $golangAPIModuleOptions.golang.topicPackagePath -}}
+
+{{- $deps := $golangAPIModuleOptions.api.deps -}}
+{{- $relayBasePkgPath := $golangAPIModuleOptions.golang.relayBasePackagePath -}}
+
+import (
+        "context"
+        "fmt"
+        "net"
+        "os"
+
+        grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+        grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
+        "{{$ioPkgPath}}"
+        {{- if $useBroadcast}}
+        {{.Basic.ModLowerCamel}}Topic "{{$topicPkgPath}}"
+        pubSubClientFac "{{$pubsubClientPkgPath}}"
+        {{- end}}
+        {{- if $useRBAC}}
+        "{{$rbacPkgPath}}"
+        "{{$identityPkgPath}}"
+        {{- end}}
+        "{{$pkgPath}}/pb"
+        "gitlab.innovationup.stream/innovation-upstream/iu-common-go/monitor"
+        "gitlab.innovationup.stream/innovation-upstream/iu-common-go/repo"
+        grpcotel "go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc"
+        "go.opentelemetry.io/otel/api/global"
+        "google.golang.org/grpc"
+        log "unknwon.dev/clog/v2"
+)
+
+func main() {
+        monitor.InitClog()
+        defer log.Stop()
+        monitor.InitCloudTraceOpenTelemetry()
+        monitor.InitBugsnag("{{.Basic.ModKebab}}", []string{"{{$pkgPath}}/**"})
+        addr := fmt.Sprintf("0.0.0.0:%d", 443)
+        lis, err := net.Listen("tcp", addr)
+        if err != nil {
+                log.Fatal("Failed to listen: %+v", err)
+        }
+
+        tracer := global.Tracer("")
+        s := grpc.NewServer(
+                grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(grpc_validator.UnaryServerInterceptor(), grpcotel.UnaryServerInterceptor(tracer))),
+                grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(grpc_validator.StreamServerInterceptor(), grpcotel.StreamServerInterceptor(tracer))),
+        )
+        svcFac := logic.New{{.Basic.ModCamel}}
+        repoFac := repo.New{{.Basic.ModCamel}}Repo
+
+        ctx := context.Background()
+        db := repo.NewFirestoreClient(ctx)
+        defer db.Close()
+
+        {{- if $useBroadcast}}
+        ps := pubSubClientFac.CreatePubsubClient(ctx)
+        defer ps.Close()
+
+        topicFac := {{.Basic.ModLowerCamel}}Topic.New{{.Basic.ModCamel}}Topic
+        {{- end}}
+
+        {{- if $useRBAC}}
+        ac := identity.GetAccessControl(ctx, rbac.AccessControlModel, db)
+        {{- end}}
+
+        server := rpc.New(tracer, svcFac, repoFac, db{{if $useRBAC}}, topicFac, ac{{end}}{{if $useBroadcast}}, ps{{end}})
+        pb.Register{{.Basic.ModCamel}}RPCServer(s, server)
+
+        log.Info("Serving gRPC on https://%s", addr)
+        err = s.Serve(lis)
+        log.Fatal("Failed to serve: %+v", err)
+}
+

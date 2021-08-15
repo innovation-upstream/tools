@@ -1,0 +1,16 @@
+func (s *{{.ModLowerCamel}}Logic) Create(ctx context.Context, subjectUID string, modList []*model.{{.ModCamel}}) error {
+  for _, d := range modList {
+    d.UID = s.uuid.New()
+    err := s.repo.Create(ctx, d)
+    if err != nil {
+      return errors.WithStack(err)
+    }
+
+    err = s.accessControl.AddPolicy(subjectUID, d.UID, string(rbacModel.{{.ModCamel}}Model), string(rbacField.Field{{.ModCamel}}All), "write")
+    if err != nil {
+      return errors.WithStack(err)
+    }
+  }
+
+  return nil
+}

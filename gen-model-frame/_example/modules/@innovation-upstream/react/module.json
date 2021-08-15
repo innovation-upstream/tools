@@ -1,0 +1,25 @@
+{
+  "name": "@innovation-upstream/react",
+  "layers": [
+    {
+      "label": "manage",
+      "sections": [
+        {
+          "label": "render"
+        },
+        {
+          "label": "hook"
+        },
+        {
+          "label": "state"
+        }
+      ],
+      "functions": [
+        {
+          "label": "@well-known/golang-api::create"
+        }
+      ]
+    }
+  ],
+  "functions": []
+}

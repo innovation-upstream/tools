@@ -1,0 +1,90 @@
+package rpc
+
+{{- $golangAPIModuleOptions := index .Basic.Options.module "@well-known/golang-api" -}}
+
+{{- $pkgPath := $golangAPIModuleOptions.golang.packagePath -}}
+
+{{- $useRBAC := eq $golangAPIModuleOptions.runtime.accessControl "rbac" -}}
+{{- $identityPkgPath := $golangAPIModuleOptions.golang.identityPackagePath -}}
+
+{{- $useBroadcast := eq $golangAPIModuleOptions.runtime.broadcast "true" -}}
+{{- $topicPkgPath := $golangAPIModuleOptions.golang.topicPackagePath -}}
+
+{{- $deps := $golangAPIModuleOptions.api.deps -}}
+{{- $relayBasePkgPath := $golangAPIModuleOptions.golang.relayBasePackagePath -}}
+
+{{- $depRelayFactoryArgList := ""}}
+{{- range $deps}}
+{{- $r := getModelNameFromLabel .}}
+{{- $rLower := lowerCamel $r}}
+{{- $rCamel := camelcase $r}}
+{{- $argName := cat $rLower "RelayFactory" | replace " " ""}}
+{{- $argType := cat $rLower "Relay." $rCamel "RelayFactory" | replace " " ""}}
+{{- $arg := cat "," $argName $argType}}
+{{- $depRelayFactoryArgList = $depRelayFactoryArgList | cat $arg | trim}}
+{{- end}}
+
+import (
+        "context"
+
+        "cloud.google.com/go/firestore"
+        "cloud.google.com/go/firestore"
+        "github.com/bugsnag/bugsnag-go"
+        "github.com/golang/protobuf/ptypes/empty"
+        "{{$pkgPath}}/internal/logic"
+        "{{$pkgPath}}/pb"
+        "{{$pkgPath}}/pb/transform"
+        {{- if $useBroadcast}}
+        {{.Basic.ModLowerCamel}}Topic "{{$topicPkgPath}}"
+        "cloud.google.com/go/pubsub"
+        {{- end}}
+        {{- if $useRBAC}}
+        "{{$identityPkgPath}}"
+        {{- end}}
+        "go.opentelemetry.io/otel/api/trace"
+        "unknwon.dev/clog/v2"
+        {{- range $deps}}
+        {{- $r := getModelNameFromLabel .}}
+        {{lowerCamel $r}}Relay "{{$relayBasePkgPath}}/{{kebabcase $r}}/{{kebabcase $r}}"
+        {{- end}}
+)
+
+type server struct {
+        tracer      trace.Tracer
+        logicFactory  logic.{{.Basic.ModCamel}}LogicFactory
+        repoFactory repo.{{.Basic.ModCamel}}RepoFactory
+        db *firestore.Client
+        {{- if $useRBAC}}
+        accessControl identity.AccessControl
+        {{- end}}
+        {{- if $useBroadcast}}
+        ps *pubsub.Client
+        {{- end}}
+        {{- range $deps}}
+        {{- $r := getModelNameFromLabel .}}
+        {{lowerCamel $r}}RelayFactory {{lowerCamel $r}}Relay.{{camelcase $r}}RelayFactory
+        {{- end}}
+}
+
+func New(t trace.Tracer, lgcFac logic.{{.Basic.ModCamel}}LogicFactory, repoFac repo.{{.Basic.ModCamel}}RepoFactory, db *firestore.Client{{if $useRBAC}}, ac identity.AccessControl{{end}}{{if $useBroadcast}}, tpc {{.Basic.ModLowerCamel}}Topic.{{.Basic.ModCamel}}Topic, ps *pubsub.Client{{end}}{{$depRelayFactoryArgList}}) pb.{{.Basic.ModCamel}}RPCServer {
+        return &server{
+                tracer:      t,
+                logicFactory:  lgcFac,
+                repoFactory: repoFac,
+                db: db,
+                {{- if $useRBAC}}
+                accessControl: ac,
+                {{- end}}
+                {{- if $useBroadcast}}
+                ps: ps,
+                {{- end}}
+        }
+}
+
+func (s *server) GetLogic(ctx context.Context) logic.{{.Basic.ModCamel}}Logic {
+        r := s.repoFactory.Create{{.Basic.ModCamel}}Repo(s.db)
+        lgc := s.logicFactory.Create{{.Basic.ModCamel}}Logic(r, s.ac)
+        return lgc
+}
+
+{{.Sections.method}}

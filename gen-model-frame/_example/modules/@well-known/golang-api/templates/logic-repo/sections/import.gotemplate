@@ -1,0 +1,5 @@
+{{- $golangAPIModuleOptions := index .Options.module "@well-known/golang-api" -}}
+
+{{- $uuidHelpersPkgPath := $golangAPIModuleOptions.golang.uuidHelpersPackagePath -}}
+
+helpers "{{$uuidHelpersPkgPath}}"
