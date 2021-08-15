@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["model_analyzer.go"],
+    importpath = "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/analyze",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/label:go_default_library",
+        "//internal/model:go_default_library",
+        "//internal/module:go_default_library",
+        "@com_github_pkg_errors//:go_default_library",
+    ],
+)

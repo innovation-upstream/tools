@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "filesystem_template_registry.go",
+        "template_registry.go",
+    ],
+    importpath = "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/template/registry",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/label:go_default_library",
+        "@com_github_pkg_errors//:go_default_library",
+        "@dev_unknwon_clog_v2//:go_default_library",
+    ],
+)

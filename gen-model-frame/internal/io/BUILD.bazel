@@ -1,0 +1,26 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "in.go",
+        "out.go",
+    ],
+    importpath = "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/io",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/analyze:go_default_library",
+        "//internal/code_layer_generator:go_default_library",
+        "//internal/code_layer_generator/gotemplate:go_default_library",
+        "//internal/config:go_default_library",
+        "//internal/generator:go_default_library",
+        "//internal/io/out/target:go_default_library",
+        "//internal/label:go_default_library",
+        "//internal/model:go_default_library",
+        "//internal/module:go_default_library",
+        "//internal/module/registry:go_default_library",
+        "//internal/template/registry:go_default_library",
+        "//internal/transform:go_default_library",
+        "@com_github_pkg_errors//:go_default_library",
+    ],
+)

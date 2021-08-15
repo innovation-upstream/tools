@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["filesystem.go"],
+    importpath = "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/io/out/target",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/config:go_default_library",
+        "//internal/model:go_default_library",
+        "//internal/module:go_default_library",
+    ],
+)

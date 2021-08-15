@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "module_header_mock.go",
+        "module_registry_mock.go",
+    ],
+    importpath = "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/module/mock",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/module/registry:go_default_library",
+        "@com_github_golang_mock//gomock:go_default_library",
+    ],
+)
