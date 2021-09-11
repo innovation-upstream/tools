@@ -11,7 +11,7 @@ import (
 
 var bazelTargetScopeFlag = flag.String("bazel-target-scope", "//...", "specify the bazel target to use as the scope/closure for queries")
 var fromSHAFlag = flag.String("from-sha", "", "specify the base git commit to use in git diff-tree")
-var toSHAFlag = flag.String("to-sha", "", "specify the current git commit to use in git diff-tree")
+var toSHAFlag = flag.String("to-sha", "HEAD", "specify the current git commit to use in git diff-tree")
 
 func main() {
 	// TODO: use a flag to control the log level
@@ -33,13 +33,13 @@ func main() {
 
 	potentiallyBrokenConsumers, err := cmd.CheckBreaking(fromSHA, toSHA, bazelTargetScope)
 	if err != nil {
-		panic(err)
+		clog.Fatal("%+v", err)
 	}
 
 	for _, t := range potentiallyBrokenConsumers {
 		_, err := os.Stdout.WriteString(fmt.Sprintf("%s\n", t))
 		if err != nil {
-			panic(err)
+			clog.Fatal("%+v", err)
 		}
 	}
 }

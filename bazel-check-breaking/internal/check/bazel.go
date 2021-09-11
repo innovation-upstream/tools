@@ -26,6 +26,7 @@ func NewBazelCheck(targetScope string) Check {
 
 func (c *bazelCheck) GetPotentiallyBrokenConsumers(workspaceFilePaths []string, allConsumers []string) ([]string, error) {
 	var dependantBins []string
+	// TODO: extract into a func and use go routines to speed up (may need to use different bazel cache patsh to allow concurrency
 	for _, f := range workspaceFilePaths {
 		if f == "" {
 			continue

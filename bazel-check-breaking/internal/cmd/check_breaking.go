@@ -25,6 +25,7 @@ func CheckBreaking(fromSHA string, toSHA string, bazelTargetScope string) ([]str
 
 	//TODO: de-dupe git files so we just check pkgs and not every file
 
+	// TODO: move this to a struct
 	// Get all go binaries
 	bazelBinsCmd := exec.Command("bazel", "query", fmt.Sprintf("kind(go_binary.*, %s)", bazelTargetScope), "--output", "label")
 	bazelBinsOut, err := bazelBinsCmd.CombinedOutput()
