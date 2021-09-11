@@ -4,13 +4,13 @@
     {
       "label": "data-repo",
       "file": {
-        "pathTemplate": "internal/repo/[modelNameSnake].go"
+        "pathTemplate": "[modelNameKebab]/internal/repo/[modelNameSnake].go"
       }
     },
     {
       "label": "logic-repo",
       "file": {
-        "pathTemplate": "internal/logic/[modelNameSnake].go"
+        "pathTemplate": "[modelNameKebab]/internal/logic/[modelNameSnake].go"
       },
       "deps": [
         {
@@ -21,13 +21,13 @@
     {
       "label": "io-grpc",
       "file": {
-        "pathTemplate": "internal/rpc/handler.go"
+        "pathTemplate": "[modelNameKebab]/internal/rpc/handler.go"
       }
     },
     {
       "label": "init",
       "file": {
-        "pathTemplate": "main.go"
+        "pathTemplate": "[modelNameKebab]/main.go"
       }
     }
   ]

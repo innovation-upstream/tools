@@ -11,4 +11,4 @@ var ModelFilePathTemplateSnakeMergeFieldPattern = regexp.MustCompile(`\[modelNam
 
 var ModelFilePathTemplateKebabMergeFieldPattern = regexp.MustCompile(`\[modelNameKebab\]`)
 
-var ModelFilePathTemplatePattern = regexp.MustCompile(fmt.Sprintf(`^((\w|-){1,}\/?)*(%s|%s)?\.?\w*$`, ModelFilePathTemplateSnakeMergeFieldPattern, ModelFilePathTemplateKebabMergeFieldPattern))
+var ModelFilePathTemplatePattern = regexp.MustCompile(fmt.Sprintf(`^(((\w|-){1,}\/?)*((%s|%s)\/?)*)*\.?\w*$`, ModelFilePathTemplateSnakeMergeFieldPattern, ModelFilePathTemplateKebabMergeFieldPattern))

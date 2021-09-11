@@ -10,30 +10,45 @@ import (
 
 type (
 	FileSystemOutputTarget interface {
-		GetLayerOutputPath(file module.ModelLayerFile) string
+		GetLayerOutputPath(layer *module.ModelLayer) string
 	}
 
 	fileSystemOutputTarget struct {
-		BaseOutputDirectory config.ModelFilePathTemplate
-		ModelLabel          model.ModelLabel
+		ModelLabel   model.ModelLabel
+		ConfigOutput config.ConfigOutput
 	}
 
 	FileSystemOutputTargetFactory func(BaseOutputDirectory config.ModelFilePathTemplate, ModelLabel model.ModelLabel) FileSystemOutputTarget
 )
 
-func NewFileSystemOutputTarget(BaseOutputDirectory config.ModelFilePathTemplate, ModelLabel model.ModelLabel) FileSystemOutputTarget {
+func NewFileSystemOutputTarget(ModelLabel model.ModelLabel, configOutput config.ConfigOutput) FileSystemOutputTarget {
 	return &fileSystemOutputTarget{
-		BaseOutputDirectory: BaseOutputDirectory,
-		ModelLabel:          ModelLabel,
+		ModelLabel:   ModelLabel,
+		ConfigOutput: configOutput,
 	}
 }
 
-func (o *fileSystemOutputTarget) GetLayerOutputPath(file module.ModelLayerFile) string {
+func (o *fileSystemOutputTarget) GetLayerOutputPath(layer *module.ModelLayer) string {
 	var sb strings.Builder
+	globalOutPrefix := o.ConfigOutput.GlobalPrefix
+	moduleOutPrefix, override := o.ConfigOutput.GetOutputForLayer(layer.Label)
+	layerPathTpl := layer.File.PathTemplate
 
-	sb.WriteString(o.BaseOutputDirectory.Compile(o.ModelLabel))
-	sb.WriteRune('/')
-	sb.WriteString(file.PathTemplate.Compile(o.ModelLabel))
+	if override.PathTemplate != "" {
+		layerPathTpl = override.PathTemplate
+	}
+
+	if globalOutPrefix != "" {
+		sb.WriteString(o.ConfigOutput.GlobalPrefix.Compile(o.ModelLabel))
+		sb.WriteRune('/')
+	}
+
+	if moduleOutPrefix != "" {
+		sb.WriteString(moduleOutPrefix.Compile(o.ModelLabel))
+		sb.WriteRune('/')
+	}
+
+	sb.WriteString(layerPathTpl.Compile(o.ModelLabel))
 
 	outDir := sb.String()
 

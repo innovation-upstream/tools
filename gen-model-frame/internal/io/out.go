@@ -74,8 +74,7 @@ func (o *modelOut) OutputGenerated() error {
 	}
 
 	for _, c := range content {
-		// if there is no out dir, dump to stdout
-		if o.Config.OutputDirectory == "" {
+		if o.Config.Output.Target != config.ConfigOutputTargetFileSystem {
 			raw, err := json.Marshal(c)
 			if err != nil {
 				return errors.WithStack(err)
@@ -85,12 +84,12 @@ func (o *modelOut) OutputGenerated() error {
 			return nil
 		}
 
-		outTarget := target.NewFileSystemOutputTarget(o.Config.OutputDirectory, o.Model.Label)
+		outTarget := target.NewFileSystemOutputTarget(o.Model.Label, o.Config.Output)
 		for _, v := range c {
 			for layerLbl, codeLayerContent := range v {
 				layer := searchForModelLayer(modules, layerLbl)
 
-				layerFilePath := outTarget.GetLayerOutputPath(layer.File)
+				layerFilePath := outTarget.GetLayerOutputPath(layer)
 				dir, _ := path.Split(layerFilePath)
 				err := os.MkdirAll(dir, 0755)
 				if err != nil {

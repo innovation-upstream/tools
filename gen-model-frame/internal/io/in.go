@@ -6,6 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/config"
+	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/label"
 	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/model"
 )
 
@@ -20,6 +21,12 @@ func ParseConfigFile() (config.ModelFrameGenConfig, error) {
 	err = json.Unmarshal([]byte(data), &cfg)
 	if err != nil {
 		return cfg, errors.WithStack(err)
+	}
+
+	for _, m := range cfg.Output.ModuleLayerFileOverrides {
+		for _, f := range m.Files {
+			f.Label = label.NameToModelFrameResourceLabel(string(m.Label.GetNamespace()), "layer", string(string(f.Label)))
+		}
 	}
 
 	return cfg, nil
