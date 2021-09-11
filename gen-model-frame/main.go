@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
-	"os"
-
-	"gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/io"
+	"github.com/pkg/errors"
+	"innovationup.stream/tools/gen-model-frame/input/filesystem"
 	clog "unknwon.dev/clog/v2"
 )
 
@@ -15,29 +13,25 @@ func main() {
 		},
 	)
 	if err != nil {
-		fmt.Printf("%+v", fmt.Errorf("%+v", err))
-		os.Exit(1)
+		clog.Fatal("%+v", errors.WithStack(err))
 	}
 	defer clog.Stop()
 
-	cfg, err := io.ParseConfigFile()
+	cfg, err := filesystem.ParseConfigFile()
 	if err != nil {
-		fmt.Printf("%+v", fmt.Errorf("%+v", err))
-		os.Exit(1)
+		clog.Fatal("%+v", errors.WithStack(err))
 	}
 
-	mods, err := io.ParseModelsFile(cfg)
+	mods, err := filesystem.ParseModelsFile(cfg)
 	if err != nil {
-		fmt.Printf("%+v", fmt.Errorf("%+v", err))
-		os.Exit(1)
+		clog.Fatal("%+v", errors.WithStack(err))
 	}
 
 	for _, m := range mods {
-		outGen := io.NewModelOut(m, cfg)
+		outGen := NewModelOut(m, cfg)
 		err := outGen.OutputGenerated()
 		if err != nil {
-			fmt.Printf("%+v", fmt.Errorf("%+v", err))
-			os.Exit(1)
+			clog.Fatal("%+v", errors.WithStack(err))
 		}
 	}
 }

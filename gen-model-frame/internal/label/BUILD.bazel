@@ -1,9 +1,0 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
-
-go_library(
-    name = "go_default_library",
-    srcs = ["label.go"],
-    importpath = "gitlab.innovationup.stream/innovation-upstream/tools/gen-model-frame/internal/label",
-    visibility = ["//:__subpackages__"],
-    deps = ["//internal/regexp:go_default_library"],
-)
