@@ -34,10 +34,12 @@ func (a *modelAnalyzer) GetDependencyModules(prevLayerModules []*module.ModelFra
 	var prevLayerDepLabels []label.ModelFrameResourceLabel
 	for _, m := range prevLayerModules {
 		for _, l := range m.Layers {
-			for _, d := range l.Deps {
-				// Prevent infinite loop when a module layer depends on sibling layers
-				if d.Label.GetNamespace() != m.Name.GetNamespace() {
-					prevLayerDepLabels = append(prevLayerDepLabels, d.Label)
+			for _, i := range l.Implementations {
+				for _, d := range i.Deps {
+					// Prevent infinite loop when a module layer depends on sibling layers
+					if d.LayerLabel.GetNamespace() != m.Name {
+						prevLayerDepLabels = append(prevLayerDepLabels, d.LayerLabel)
+					}
 				}
 			}
 		}
@@ -67,8 +69,8 @@ func (a *modelAnalyzer) GetModules() ([]*module.ModelFrameModule, error) {
 
 	var modulesToLoad []label.ModelFrameResourceLabel
 	for _, fp := range a.Model.FramePaths {
-		for _, modelFrameModuleName := range fp.Layers {
-			modulesToLoad = append(modulesToLoad, modelFrameModuleName)
+		for _, layerImplDep := range fp.Layers {
+			modulesToLoad = append(modulesToLoad, layerImplDep.LayerLabel)
 		}
 	}
 

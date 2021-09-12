@@ -5,8 +5,8 @@ import (
 	"innovationup.stream/tools/gen-model-frame/core/model"
 )
 
-type RenderedCodeLayers map[label.ModelFrameResourceLabel]string
+type RenderedModelLayers map[label.ModelFrameResourceLabel]string
 
-type CodeLayerRenderer interface {
-	GenerateCodeLayersForFramePath(mod model.ModelLayers) ([]RenderedCodeLayers, error)
+type ModelLayerRenderer interface {
+	GenerateCodeLayersForFramePath(layers model.ModelLayers) (map[label.ModelFrameResourceLabel]RenderedModelLayers, error)
 }

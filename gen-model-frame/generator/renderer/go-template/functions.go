@@ -4,7 +4,7 @@ import (
 	"text/template"
 
 	"github.com/iancoleman/strcase"
-	"innovationup.stream/tools/gen-model-frame/core/model"
+	"innovationup.stream/tools/gen-model-frame/core/label"
 )
 
 func TxtFuncMap() template.FuncMap {
@@ -17,7 +17,7 @@ var funcMap = map[string]interface{}{
 }
 
 func getModelNameFromLabel(name string) string {
-	return model.ModelLabel(name).GetName()
+	return label.ModelLabel(name).GetName()
 }
 
 func lowerCamel(str string) string {

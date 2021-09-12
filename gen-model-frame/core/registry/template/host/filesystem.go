@@ -18,10 +18,10 @@ func NewFileSystemTemplateRegistry() TemplateRegistry {
 	return &fsTemplateRegistry{}
 }
 
-func (l *fsTemplateRegistry) LoadTemplateForAllSections(layerLabel label.ModelFrameResourceLabel) (map[label.ModelFrameResourceLabel]string, error) {
+func (l *fsTemplateRegistry) LoadTemplateForAllSections(layerLabel label.ModelFrameResourceLabel, implementationLabel label.ModelFrameResourceLabel) (map[label.ModelFrameResourceLabel]string, error) {
 	tmpls := make(map[label.ModelFrameResourceLabel]string)
 
-	sectionsDirPath := fmt.Sprintf("modules/%s/templates/%s/sections", layerLabel.GetNamespace(), layerLabel.GetResourceName())
+	sectionsDirPath := fmt.Sprintf("modules/%s/templates/%s/%s/sections", layerLabel.GetNamespace(), layerLabel.GetResourceName(), implementationLabel.GetResourceName())
 	f, err := os.Open(sectionsDirPath)
 	if err != nil {
 		if _, ok := err.(*os.PathError); ok {
@@ -54,10 +54,10 @@ func (l *fsTemplateRegistry) LoadTemplateForAllSections(layerLabel label.ModelFr
 	return tmpls, nil
 }
 
-func (l *fsTemplateRegistry) LoadLayerLayoutTemplate(layerLabel label.ModelFrameResourceLabel) (string, error) {
+func (l *fsTemplateRegistry) LoadLayerLayoutTemplate(layerLabel label.ModelFrameResourceLabel, implementationLabel label.ModelFrameResourceLabel) (string, error) {
 	var tmpl string
 
-	sectionTemplatePath := fmt.Sprintf("modules/%s/templates/%s/layout.gotemplate", layerLabel.GetNamespace(), layerLabel.GetResourceName())
+	sectionTemplatePath := fmt.Sprintf("modules/%s/templates/%s/%s/layout.gotemplate", layerLabel.GetNamespace(), layerLabel.GetResourceName(), implementationLabel.GetResourceName())
 	by, err := ioutil.ReadFile(sectionTemplatePath)
 	if err != nil {
 		return tmpl, errors.WithStack(err)

@@ -6,22 +6,22 @@ import (
 )
 
 type (
-	ModelFramePathGoTemplateTransformer interface {
+	GoTemplateModelLayerRendererTransformer interface {
 		ModelFramePathToBasicTemplateInputPtr(fp model.ModelLayers) *BasicTemplateInput
 		LayerSectionsToGoBasicLayoutTemplateInputPtr(basic BasicTemplateInput, layerSections map[string]string) *GoBasicLayoutTemplateInput
 	}
-	modelFramePathGoTemplateTransformer struct {
+	goTemplateModelLayerRendererTransformer struct {
 		model *model.Model
 	}
 )
 
-func NewModelFramePathGoTemplateTransformer(model *model.Model) ModelFramePathGoTemplateTransformer {
-	return &modelFramePathGoTemplateTransformer{
+func NewModelFramePathGoTemplateTransformer(model *model.Model) GoTemplateModelLayerRendererTransformer {
+	return &goTemplateModelLayerRendererTransformer{
 		model,
 	}
 }
 
-func (t *modelFramePathGoTemplateTransformer) ModelFramePathToBasicTemplateInputPtr(fp model.ModelLayers) *BasicTemplateInput {
+func (t *goTemplateModelLayerRendererTransformer) ModelFramePathToBasicTemplateInputPtr(fp model.ModelLayers) *BasicTemplateInput {
 	n := t.model.Label
 	return &BasicTemplateInput{
 		ModCamel:      strcase.ToCamel(n.GetName()),
@@ -32,7 +32,7 @@ func (t *modelFramePathGoTemplateTransformer) ModelFramePathToBasicTemplateInput
 	}
 }
 
-func (t *modelFramePathGoTemplateTransformer) LayerSectionsToGoBasicLayoutTemplateInputPtr(basic BasicTemplateInput, sections map[string]string) *GoBasicLayoutTemplateInput {
+func (t *goTemplateModelLayerRendererTransformer) LayerSectionsToGoBasicLayoutTemplateInputPtr(basic BasicTemplateInput, sections map[string]string) *GoBasicLayoutTemplateInput {
 	return &GoBasicLayoutTemplateInput{
 		Basic:    basic,
 		Sections: sections,

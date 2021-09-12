@@ -7,6 +7,7 @@ import (
 	"innovationup.stream/tools/gen-model-frame/core/module"
 	host "innovationup.stream/tools/gen-model-frame/core/registry/template/host"
 	"innovationup.stream/tools/gen-model-frame/core/template"
+	"unknwon.dev/clog/v2"
 )
 
 type (
@@ -27,21 +28,21 @@ func NewTemplateLoader(modules []*module.ModelFrameModule, registry host.Templat
 	}
 }
 
-func (loader *templateLoader) LoadLayerTemplates(l module.ModelLayer) (template.TemplatesForLayer, error) {
+func (loader *templateLoader) LoadLayerImplementationTemplates(impl module.ModelLayerImplementation) (template.TemplatesForLayerImplementation, error) {
 	var layerLayoutTmpl string
-	var templatesForLayer template.TemplatesForLayer
+	var templatesForLayer template.TemplatesForLayerImplementation
 
-	sectionTemplates, err := loader.registry.LoadTemplateForAllSections(l.Label)
+	sectionTemplates, err := loader.registry.LoadTemplateForAllSections(impl.ForLayer, impl.Label)
 	if err != nil {
 		return templatesForLayer, errors.WithStack(err)
 	}
 
-	layerLayoutTmpl, err = loader.registry.LoadLayerLayoutTemplate(l.Label)
+	layerLayoutTmpl, err = loader.registry.LoadLayerLayoutTemplate(impl.ForLayer, impl.Label)
 	if err != nil {
 		return templatesForLayer, errors.WithStack(err)
 	}
 
-	templatesForLayer = template.TemplatesForLayer{
+	templatesForLayer = template.TemplatesForLayerImplementation{
 		SectionTemplates: sectionTemplates,
 		LayoutTemplate:   layerLayoutTmpl,
 	}
@@ -49,73 +50,123 @@ func (loader *templateLoader) LoadLayerTemplates(l module.ModelLayer) (template.
 	return templatesForLayer, nil
 }
 
-func (loader *templateLoader) getDependancyLayersToLoad(l module.ModelLayer) []module.ModelLayer {
-	var layersToLoad []module.ModelLayer
+// TODO: prevent deuplicate layers/implementations from being loaded here
+func (loader *templateLoader) getDependancyLayersToLoad(i module.ModelLayerImplementation) ([]module.ModelLayerImplementation, []module.ModelLayer) {
+	var layerImplementationsToLoad []module.ModelLayerImplementation
+	var looseLayerDeps []module.ModelLayer
 
-	layersToLoad = append(layersToLoad, l)
+	layerImplementationsToLoad = append(layerImplementationsToLoad, i)
 
-	for _, d := range l.Deps {
-		// find the layer for dep
+top:
+	for _, d := range i.Deps {
+		// find the implementation for dep
 		for _, am := range loader.modules {
-			if am.Name.GetNamespace() == d.Label.GetNamespace() {
+			if am.Name == d.LayerLabel.GetNamespace() {
 				for _, al := range am.Layers {
-					if al.Label == d.Label {
-						depLayersToLoad := loader.getDependancyLayersToLoad(al)
-						layersToLoad = append(layersToLoad, depLayersToLoad...)
+					if al.Label == d.LayerLabel {
+						if d.ImplementationLabel == "" {
+							looseLayerDeps = append(looseLayerDeps, al)
+							continue top
+						} else {
+							for _, li := range al.Implementations {
+								if li.Label == d.ImplementationLabel {
+									depLayersToLoad, depLooseLayerDeps := loader.getDependancyLayersToLoad(li)
+									for _, v := range depLayersToLoad {
+										layerImplementationsToLoad = append(layerImplementationsToLoad, v)
+									}
+									looseLayerDeps = append(looseLayerDeps, depLooseLayerDeps...)
+									continue top
+								}
+							}
+						}
 					}
 				}
 			}
 		}
+		clog.Error("No implementation found for dependancy: %s", d.LayerLabel)
 	}
 
-	return layersToLoad
+	return layerImplementationsToLoad, looseLayerDeps
 }
 
+// TODO: break this up
 func (loader *templateLoader) LoadModuleTemplates(fp model.ModelLayers) (*template.ModuleTemplates, error) {
 	var mod template.ModuleTemplates
-	var templates []template.TemplatesForLayers
+	templates := make(map[label.ModelFrameResourceLabel]template.TemplatesForLayerImplementations)
 
-	var allLayersToLoad []module.ModelLayer
+	var allLayerImplementationsToLoad []module.ModelLayerImplementation
+	var allLooseLayerDeps []module.ModelLayer
 	// find the layer entrypoints to build our dep tree from
 	for _, l := range fp.Layers {
 		for _, m := range loader.modules {
-			if m.Name.GetNamespace() == l.GetNamespace() {
+			if m.Name == l.LayerLabel.GetNamespace() {
 				for _, ml := range m.Layers {
-					if ml.Label == l {
-						depLayers := loader.getDependancyLayersToLoad(ml)
-						allLayersToLoad = append(allLayersToLoad, depLayers...)
+					if ml.Label == l.LayerLabel {
+						for _, i := range ml.Implementations {
+							if i.Label == l.ImplementationLabel {
+								depLayers, looseLayerDeps := loader.getDependancyLayersToLoad(i)
+								allLayerImplementationsToLoad = append(allLayerImplementationsToLoad, depLayers...)
+								allLooseLayerDeps = append(allLooseLayerDeps, looseLayerDeps...)
+							}
+						}
 					}
 				}
 			}
 		}
 	}
 
+	// Verfiy we loaded an implementation for every dep layer
+top:
+	for _, l := range allLooseLayerDeps {
+		for _, m := range loader.modules {
+			if m.Name == l.Label.GetNamespace() {
+				for _, ml := range m.Layers {
+					if ml.Label == l.Label {
+						for _, li := range l.Implementations {
+							for _, i := range allLayerImplementationsToLoad {
+								if i.Label == li.Label {
+									for _, d := range li.Deps {
+										if i.Label == d.ImplementationLabel {
+											continue top
+										}
+									}
+									continue top
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		clog.Fatal("No implementation loaded for dependancy on: %s", l.Label)
+	}
+
 	// De-dupe layers
-	var layersToLoad []module.ModelLayer
+	var layerImplementationsToLoad []module.ModelLayerImplementation
 all:
-	for _, al := range allLayersToLoad {
-		for _, l := range layersToLoad {
-			if l.Label == al.Label {
+	for _, li := range allLayerImplementationsToLoad {
+		for _, i := range layerImplementationsToLoad {
+			if i.Label == li.Label && i.ForLayer == li.ForLayer {
 				continue all
 			}
 		}
-		layersToLoad = append(layersToLoad, al)
+		layerImplementationsToLoad = append(layerImplementationsToLoad, li)
 	}
 
-	var templatesForLayers template.TemplatesForLayers
-	layerTemplates := make(map[label.ModelFrameResourceLabel]template.TemplatesForLayer)
-
-	for _, l := range layersToLoad {
-		tmpltesForLayer, err := loader.LoadLayerTemplates(l)
+	clog.Trace("Loading templates for %+v", layerImplementationsToLoad)
+	// Actually load the templates
+	for _, i := range layerImplementationsToLoad {
+		tmpltesForLayerImpl, err := loader.LoadLayerImplementationTemplates(i)
 		if err != nil {
 			return &mod, errors.WithStack(err)
 		}
 
-		layerTemplates[l.Label] = tmpltesForLayer
+		templates[i.ForLayer] = template.TemplatesForLayerImplementations{
+			LayerImplementationTemplates: map[label.ModelFrameResourceLabel]template.TemplatesForLayerImplementation{
+				i.Label: tmpltesForLayerImpl,
+			},
+		}
 	}
-
-	templatesForLayers.LayerTemplates = layerTemplates
-	templates = append(templates, templatesForLayers)
 
 	mod = template.ModuleTemplates{
 		Templates: templates,

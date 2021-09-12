@@ -4,14 +4,14 @@ import "innovationup.stream/tools/gen-model-frame/core/label"
 
 type (
 	ModuleTemplates struct {
-		Templates []TemplatesForLayers
+		Templates map[label.ModelFrameResourceLabel]TemplatesForLayerImplementations
 	}
 
-	TemplatesForLayers struct {
-		LayerTemplates map[label.ModelFrameResourceLabel]TemplatesForLayer
+	TemplatesForLayerImplementations struct {
+		LayerImplementationTemplates map[label.ModelFrameResourceLabel]TemplatesForLayerImplementation
 	}
 
-	TemplatesForLayer struct {
+	TemplatesForLayerImplementation struct {
 		SectionTemplates map[label.ModelFrameResourceLabel]string
 		LayoutTemplate   string
 	}

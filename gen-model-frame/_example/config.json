@@ -5,20 +5,8 @@
     "module": [
       {
         "label": "@well-known/golang-api",
-        "prefix": "go/[modelNameKebab]",
+        "prefix": "go",
         "file": [
-          {
-            "label": "data-repo",
-            "pathTemplate": "internal/repo/[modelNameSnake].go"
-          },
-          {
-            "label": "logic-repo",
-            "pathTemplate": "internal/logic/[modelNameSnake].go"
-          },
-          {
-            "label": "io-grpc",
-            "pathTemplate": "internal/rpc/handler.go"
-          },
           {
             "label": "init",
             "pathTemplate": "main.go"

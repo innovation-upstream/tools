@@ -14,38 +14,38 @@ import (
 	"innovationup.stream/tools/gen-model-frame/generator/renderer"
 )
 
-type templateHydrator struct {
-	transform             ModelFramePathGoTemplateTransformer
+type goTemplateModelLayerRenderer struct {
+	transform             GoTemplateModelLayerRendererTransformer
 	TemplatesForFramePath *moduleTmpl.ModuleTemplates
 }
 
-func NewTemplateHydrator(transform ModelFramePathGoTemplateTransformer, TemplatesForModules *moduleTmpl.ModuleTemplates) renderer.CodeLayerRenderer {
-	return &templateHydrator{
+func NewGoTemplateModelLayerRenderer(transform GoTemplateModelLayerRendererTransformer, TemplatesForModules *moduleTmpl.ModuleTemplates) renderer.ModelLayerRenderer {
+	return &goTemplateModelLayerRenderer{
 		transform:             transform,
 		TemplatesForFramePath: TemplatesForModules,
 	}
 }
 
-func (g *templateHydrator) GenerateCodeLayersForFramePath(framePath model.ModelLayers) ([]renderer.RenderedCodeLayers, error) {
-	var out []renderer.RenderedCodeLayers
+func (g *goTemplateModelLayerRenderer) GenerateCodeLayersForFramePath(framePath model.ModelLayers) (map[label.ModelFrameResourceLabel]renderer.RenderedModelLayers, error) {
+	out := make(map[label.ModelFrameResourceLabel]renderer.RenderedModelLayers)
 
-	for _, templatesForLayers := range g.TemplatesForFramePath.Templates {
+	for layerLbl, templatesForLayers := range g.TemplatesForFramePath.Templates {
 		hydratedTemplatesForModuleLayers, err := g.hydrateModuleTemplates(framePath, templatesForLayers)
 		if err != nil {
 			return out, errors.WithStack(err)
 		}
 
-		out = append(out, hydratedTemplatesForModuleLayers)
+		out[layerLbl] = hydratedTemplatesForModuleLayers
 	}
 
 	return out, nil
 }
 
-func (g *templateHydrator) hydrateModuleTemplates(framePath model.ModelLayers, templatesForLayers moduleTmpl.TemplatesForLayers) (map[label.ModelFrameResourceLabel]string, error) {
+func (g *goTemplateModelLayerRenderer) hydrateModuleTemplates(layers model.ModelLayers, templatesForLayers moduleTmpl.TemplatesForLayerImplementations) (map[label.ModelFrameResourceLabel]string, error) {
 	templatesForModuleLayers := make(map[label.ModelFrameResourceLabel]string)
-	tmplData := g.transform.ModelFramePathToBasicTemplateInputPtr(framePath)
+	tmplData := g.transform.ModelFramePathToBasicTemplateInputPtr(layers)
 
-	for k, templatesForLayer := range templatesForLayers.LayerTemplates {
+	for k, templatesForLayer := range templatesForLayers.LayerImplementationTemplates {
 		layerTmplSections, err := g.hydrateLayerTemplates(templatesForLayer, tmplData, k)
 		if err != nil {
 			return templatesForModuleLayers, errors.WithStack(err)
@@ -73,7 +73,7 @@ func (g *templateHydrator) hydrateModuleTemplates(framePath model.ModelLayers, t
 }
 
 // TODO: move this to a layer hydrator struct
-func (g *templateHydrator) hydrateLayerTemplates(templatesForLayer moduleTmpl.TemplatesForLayer, tmplData *BasicTemplateInput, layerLabel label.ModelFrameResourceLabel) (map[string]string, error) {
+func (g *goTemplateModelLayerRenderer) hydrateLayerTemplates(templatesForLayer moduleTmpl.TemplatesForLayerImplementation, tmplData *BasicTemplateInput, layerLabel label.ModelFrameResourceLabel) (map[string]string, error) {
 	hydratedLayerSections := make(map[string]string)
 
 	for section, tmpl := range templatesForLayer.SectionTemplates {
@@ -89,7 +89,7 @@ func (g *templateHydrator) hydrateLayerTemplates(templatesForLayer moduleTmpl.Te
 }
 
 // TODO: move this to a section hydrator struct
-func (g *templateHydrator) hydrateLayerSectionTemplate(tmpl string, data *BasicTemplateInput, sectionLabel label.ModelFrameResourceLabel, layerLabel label.ModelFrameResourceLabel) (string, error) {
+func (g *goTemplateModelLayerRenderer) hydrateLayerSectionTemplate(tmpl string, data *BasicTemplateInput, sectionLabel label.ModelFrameResourceLabel, layerLabel label.ModelFrameResourceLabel) (string, error) {
 	var hydratedSection string
 
 	t := template.Must(

@@ -8,7 +8,19 @@ import (
 	gmfRegexp "innovationup.stream/tools/gen-model-frame/core/regexp"
 )
 
-type ModelFrameResourceLabel string
+type (
+	ModelFrameResourceLabel string
+	ModelLabel              string
+)
+
+func NewModelFrameResourceLabel(l string, ns string, typ string) ModelFrameResourceLabel {
+	labelIsQualified := gmfRegexp.ModelFrameResourceLabelPattern.MatchString(l)
+	if labelIsQualified == false {
+		return ModelFrameResourceLabel(fmt.Sprintf("%s::%s/%s", ns, typ, l))
+	}
+
+	return ModelFrameResourceLabel(l)
+}
 
 // GetNamespace returns the namespace represented in the label.
 // e.g. "@innovation-updatem/golang-api" "golang-api"
@@ -57,4 +69,17 @@ func NameToModelFrameResourceLabel(ns string, resourceType string, name string) 
 	label = ModelFrameResourceLabel(fmt.Sprintf("%s::%s/%s", ns, resourceType, name))
 
 	return label
+}
+
+func (n ModelLabel) GetNamespace() string {
+	return strings.Split(string(n), "/")[0]
+}
+
+func (n ModelLabel) GetName() string {
+	s := strings.Split(string(n), "/")
+	if len(s) > 1 {
+		return s[1]
+	}
+
+	return string(n)
 }

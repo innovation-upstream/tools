@@ -52,7 +52,7 @@ func (o *modelOut) OutputGenerated() error {
 		return errors.WithStack(err)
 	}
 
-	var content [][]renderer.RenderedCodeLayers
+	var content []map[label.ModelFrameResourceLabel]renderer.RenderedModelLayers
 	// todo: move this into another struct
 	tmplReg := tmplRegistryHost.NewFileSystemTemplateRegistry()
 	tmplLoader := tmplRegistryClient.NewTemplateLoader(modules, tmplReg)
@@ -63,7 +63,7 @@ func (o *modelOut) OutputGenerated() error {
 		}
 
 		tr := goTmplRenderer.NewModelFramePathGoTemplateTransformer(&o.Model)
-		clg := goTmplRenderer.NewTemplateHydrator(tr, moduleTemplates)
+		clg := goTmplRenderer.NewGoTemplateModelLayerRenderer(tr, moduleTemplates)
 
 		gen := generator.NewModelFrameGenerator(clg)
 		framePathContent, err := gen.GenerateFrames(fp)
@@ -86,11 +86,12 @@ func (o *modelOut) OutputGenerated() error {
 		}
 
 		outTarget := target.NewFileSystemOutputTarget(o.Model.Label, o.Config.Output)
-		for _, v := range c {
-			for layerLbl, codeLayerContent := range v {
+		for layerLbl, v := range c {
+			for implLabel, codeLayerContent := range v {
 				layer := searchForModelLayer(modules, layerLbl)
+				impl := searchForModelLayerImplementation(modules, implLabel)
 
-				layerFilePath := outTarget.GetLayerOutputPath(layer)
+				layerFilePath := outTarget.GetLayerImplementationOutputPath(layer, impl)
 				dir, _ := path.Split(layerFilePath)
 				err := os.MkdirAll(dir, 0755)
 				if err != nil {
@@ -119,6 +120,22 @@ func searchForModelLayer(modules []*module.ModelFrameModule, lbl label.ModelFram
 	layer := head.GetLayerByLabel(lbl)
 	if layer == nil {
 		layer = searchForModelLayer(tail, lbl)
+	}
+
+	return layer
+}
+
+func searchForModelLayerImplementation(modules []*module.ModelFrameModule, lbl label.ModelFrameResourceLabel) *module.ModelLayerImplementation {
+	if len(modules) == 0 {
+		return nil
+	}
+
+	head := modules[0]
+	tail := modules[1:]
+
+	layer := head.GetLayerImplementationByLabel(lbl)
+	if layer == nil {
+		layer = searchForModelLayerImplementation(tail, lbl)
 	}
 
 	return layer

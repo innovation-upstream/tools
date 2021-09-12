@@ -5,8 +5,12 @@ import (
 	"regexp"
 )
 
-var ModelFilePathTemplateSnakeMergeFieldPattern = regexp.MustCompile(`\[modelNameSnake\]`)
+var FilePathTemplateModelNameSnakeMergeFieldPattern = regexp.MustCompile(`\[modelNameSnake\]`)
 
-var ModelFilePathTemplateKebabMergeFieldPattern = regexp.MustCompile(`\[modelNameKebab\]`)
+var FilePathTemplateModelNameKebabMergeFieldPattern = regexp.MustCompile(`\[modelNameKebab\]`)
 
-var ModelFilePathTemplatePattern = regexp.MustCompile(fmt.Sprintf(`^(((\w|-){1,}\/?)*((%s|%s)\/?)*)*\.?\w*$`, ModelFilePathTemplateSnakeMergeFieldPattern, ModelFilePathTemplateKebabMergeFieldPattern))
+var FilePathTemplateLayerImplementationLabelKebabMergeFieldPattern = regexp.MustCompile(`\[layerImplementationLabelKebab\]`)
+
+var FilePathTemplateLayerLabelKebabMergeFieldPattern = regexp.MustCompile(`\[layerLabelKebab\]`)
+
+var ModelFilePathTemplatePattern = regexp.MustCompile(fmt.Sprintf(`^(((\w|-){1,}\/?)*((%s|%s|%s|%s)\/?)*)*\.?\w*$`, FilePathTemplateModelNameSnakeMergeFieldPattern, FilePathTemplateModelNameKebabMergeFieldPattern, FilePathTemplateLayerImplementationLabelKebabMergeFieldPattern, FilePathTemplateLayerLabelKebabMergeFieldPattern))

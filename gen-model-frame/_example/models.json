@@ -4,9 +4,18 @@
     "framePaths": [
       {
         "layers": [
-          "@well-known/golang-api::layer/logic-repo",
-          "@well-known/golang-api::layer/io-grpc",
-          "@well-known/golang-api::layer/init"
+          {
+            "layerLabel": "@well-known/golang-api::layer/logic",
+            "implementationLabel": "@well-known/golang-api::implementation/repo"
+          },
+          {
+            "layerLabel": "@well-known/golang-api::layer/server",
+            "implementationLabel": "@well-known/golang-api::implementation/grpc"
+          },
+          {
+            "layerLabel": "@well-known/golang-api::layer/init",
+            "implementationLabel": "@well-known/golang-api::implementation/init"
+          }
         ]
       }
     ],

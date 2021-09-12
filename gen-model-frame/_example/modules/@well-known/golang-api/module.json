@@ -2,33 +2,83 @@
   "name": "@well-known/golang-api",
   "layers": [
     {
-      "label": "data-repo",
-      "file": {
-        "pathTemplate": "[modelNameKebab]/internal/repo/[modelNameSnake].go"
-      }
-    },
-    {
-      "label": "logic-repo",
-      "file": {
-        "pathTemplate": "[modelNameKebab]/internal/logic/[modelNameSnake].go"
-      },
-      "deps": [
+      "label": "data",
+      "pathTemplate": "[modelNameKebab]/internal/[layerLabelKebab]/[modelNameSnake].go",
+      "implementations": [
         {
-          "label": "@well-known/golang-api::layer/data-repo"
+          "label": "repo"
+        },
+        {
+          "label": "relay"
+        },
+        {
+          "label": "client",
+          "file": {
+            "pathTemplate": "[modelNameKebab]/internal/client/[modelNameSnake].go"
+          }
         }
       ]
     },
     {
-      "label": "io-grpc",
-      "file": {
-        "pathTemplate": "[modelNameKebab]/internal/rpc/handler.go"
-      }
+      "label": "logic",
+      "pathTemplate": "[modelNameKebab]/internal/[layerLabelKebab]/[modelNameSnake].go",
+      "implementations": [
+        {
+          "label": "repo",
+          "deps": [
+            {
+              "layerLabel": "@well-known/golang-api::layer/data",
+              "implementationLabel": "@well-known/golang-api::implementation/repo"
+            }
+          ]
+        },
+        {
+          "label": "relay",
+          "deps": [
+            {
+              "layerLabel": "@well-known/golang-api::layer/data",
+              "implementationLabel": "@well-known/golang-api::implementation/relay"
+            }
+          ]
+        },
+        {
+          "label": "client",
+          "deps": [
+            {
+              "layerLabel": "@well-known/golang-api::layer/data",
+              "implementationLabel": "@well-known/golang-api::implementation/client"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "label": "server",
+      "pathTemplate": "[modelNameKebab]/internal/[layerLabelKebab]/handler.go",
+      "implementations": [
+        {
+          "label": "grpc",
+          "deps": [
+            {
+              "layerLabel": "@well-known/golang-api::layer/logic"
+            }
+          ]
+        }
+      ]
     },
     {
       "label": "init",
-      "file": {
-        "pathTemplate": "[modelNameKebab]/main.go"
-      }
+      "pathTemplate": "[modelNameKebab]/main.go",
+      "implementations": [
+        {
+          "label": "init",
+          "deps": [
+            {
+              "layerLabel": "@well-known/golang-api::layer/server"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

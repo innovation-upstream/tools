@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/iancoleman/strcase"
 	"innovationup.stream/tools/gen-model-frame/core/label"
-	"innovationup.stream/tools/gen-model-frame/core/model"
 	"innovationup.stream/tools/gen-model-frame/core/regexp"
 	"unknwon.dev/clog/v2"
 )
@@ -15,9 +14,9 @@ type (
 	}
 
 	ConfigOutput struct {
-		Target                   ConfigOutputTarget
-		GlobalPrefix             ModelFilePathTemplate        `json:"globalPrefix"`
-		ModuleLayerFileOverrides []ConfigOutputModuleOverride `json:"module"`
+		Target                                 ConfigOutputTarget
+		GlobalPrefix                           ModelFilePathTemplate        `json:"globalPrefix"`
+		ModuleLayerImplementationFileOverrides []ConfigOutputModuleOverride `json:"module"`
 	}
 
 	ConfigOutputTarget string
@@ -42,7 +41,7 @@ const (
 	ConfigOutputTargetStdout = ConfigOutputTarget("stdout")
 )
 
-func (p ModelFilePathTemplate) Compile(modelLabel model.ModelLabel) string {
+func (p ModelFilePathTemplate) Compile(modelLabel label.ModelLabel, layerLbl label.ModelFrameResourceLabel, implLabel label.ModelFrameResourceLabel) string {
 	valid := regexp.ModelFilePathTemplatePattern.MatchString(string(p))
 	if !valid {
 		clog.Error("Module layer path templates must match the pattern: %s", regexp.ModelFilePathTemplatePattern.String())
@@ -51,18 +50,22 @@ func (p ModelFilePathTemplate) Compile(modelLabel model.ModelLabel) string {
 
 	ct := string(p)
 
-	ct = regexp.ModelFilePathTemplateSnakeMergeFieldPattern.ReplaceAllString(ct, strcase.ToSnake(modelLabel.GetName()))
+	ct = regexp.FilePathTemplateModelNameSnakeMergeFieldPattern.ReplaceAllString(ct, strcase.ToSnake(modelLabel.GetName()))
 
-	ct = regexp.ModelFilePathTemplateKebabMergeFieldPattern.ReplaceAllString(ct, strcase.ToKebab(modelLabel.GetName()))
+	ct = regexp.FilePathTemplateModelNameKebabMergeFieldPattern.ReplaceAllString(ct, strcase.ToKebab(modelLabel.GetName()))
+
+	ct = regexp.FilePathTemplateLayerImplementationLabelKebabMergeFieldPattern.ReplaceAllString(ct, strcase.ToKebab(implLabel.GetResourceName()))
+
+	ct = regexp.FilePathTemplateLayerLabelKebabMergeFieldPattern.ReplaceAllString(ct, strcase.ToKebab(layerLbl.GetResourceName()))
 
 	return ct
 }
 
-func (c ConfigOutput) GetOutputForLayer(l label.ModelFrameResourceLabel) (ModelFilePathTemplate, ConfigOutputModuleLayerFileOverride) {
+func (c ConfigOutput) GetOutputForLayerImplementation(l label.ModelFrameResourceLabel) (ModelFilePathTemplate, ConfigOutputModuleLayerFileOverride) {
 	var override ConfigOutputModuleLayerFileOverride
 	var modulePrefix ModelFilePathTemplate
 
-	for _, o := range c.ModuleLayerFileOverrides {
+	for _, o := range c.ModuleLayerImplementationFileOverrides {
 		if o.Label.GetNamespace() == l.GetNamespace() {
 			modulePrefix = o.Prefix
 			for _, f := range o.Files {

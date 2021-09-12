@@ -22,9 +22,9 @@ func ParseConfigFile() (config.ModelFrameGenConfig, error) {
 		return cfg, errors.WithStack(err)
 	}
 
-	for _, m := range cfg.Output.ModuleLayerFileOverrides {
+	for _, m := range cfg.Output.ModuleLayerImplementationFileOverrides {
 		for _, f := range m.Files {
-			f.Label = label.NameToModelFrameResourceLabel(string(m.Label.GetNamespace()), "layer", string(string(f.Label)))
+			f.Label = label.NewModelFrameResourceLabel(string(f.Label), m.Label.GetNamespace(), "implementation")
 		}
 	}
 
