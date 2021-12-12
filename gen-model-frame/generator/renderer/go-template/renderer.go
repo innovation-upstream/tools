@@ -89,7 +89,12 @@ func (g *goTemplateModelLayerRenderer) hydrateLayerTemplates(templatesForLayer m
 }
 
 // TODO: move this to a section hydrator struct
-func (g *goTemplateModelLayerRenderer) hydrateLayerSectionTemplate(tmpl string, data *BasicTemplateInput, sectionLabel label.ModelFrameResourceLabel, layerLabel label.ModelFrameResourceLabel) (string, error) {
+func (g *goTemplateModelLayerRenderer) hydrateLayerSectionTemplate(
+	tmpl string,
+	data *BasicTemplateInput,
+	sectionLabel label.ModelFrameResourceLabel,
+	layerLabel label.ModelFrameResourceLabel,
+) (string, error) {
 	var hydratedSection string
 
 	t := template.Must(

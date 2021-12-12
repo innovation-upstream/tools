@@ -10,6 +10,7 @@ type (
 		ModKebab      string
 		MetaData      map[string]string
 		Options       model.ModelOptions
+		Hooks         map[string]string
 	}
 
 	GoBasicLayoutTemplateInput struct {

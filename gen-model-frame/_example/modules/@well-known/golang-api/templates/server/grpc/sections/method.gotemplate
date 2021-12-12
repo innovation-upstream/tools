@@ -1,22 +1,29 @@
 func (s *server) Create(ctx context.Context, r *pb.CreateRequest) (*empty.Empty, error) {
-        ctx = bugsnag.StartSession(ctx)
-        ctx, span := s.tracer.Start(ctx, "Create")
-        defer span.End()
+  ctx = bugsnag.StartSession(ctx)
+  ctx, span := s.tracer.Start(ctx, "Create")
+  defer span.End()
 
-        db := repo.NewFirestoreClient(ctx)
-        defer db.Close()
+  db := repo.NewFirestoreClient(ctx)
+  defer db.Close()
 
-        svc := s.GetLogic(ctx, db)
-        var res empty.Empty
-        profile := transform.PbToProfilePtr(r.GetProfile())
-        err := svc.CreateProfile(ctx, profile)
-        if err != nil {
-                clog.Error("%+v", err)
-                bugsnag.Notify(err)
-                return &res, err
-        }
+  svc, cleanup, err := s.GetLogic(ctx, db)
+  if err != nil {
+    clog.Error("%+v", err)
+    bugsnag.Notify(err)
+    return errors.WithStack(err)
+  }
+  defer cleanup()
 
-        return &res, nil
+  var res empty.Empty
+  profile := transform.PbToProfilePtr(r.GetProfile())
+  err := svc.CreateProfile(ctx, profile)
+  if err != nil {
+    clog.Error("%+v", err)
+    bugsnag.Notify(err)
+    return &res, err
+  }
+
+  return &res, nil
 }
 
 
