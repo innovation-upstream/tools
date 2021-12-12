@@ -9,18 +9,9 @@ package logic
 
 {{- $modelPkgPath := $golangAPIModuleOptions.golang.modelPackagePath -}}
 
-{{- $useRBAC := eq $golangAPIModuleOptions.runtime.accessControl "rbac" -}}
-{{- $rbacFieldPkgPath := $golangAPIModuleOptions.golang.rbacFieldPackagePath -}}
-{{- $rbacModelPkgPath := $golangAPIModuleOptions.golang.rbacModelPackagePath -}}
-
 import (
   "context"
 
-  {{- if $useRBAC}}
-  rbacField "{{$rbacFieldPkgPath}}"
-  rbacModel "{{$rbacModelPkgPath}}"
-  identity "gitlab.innovationup.stream/innovation-upstream/api-frame/service/identity"
-  {{- end}}
   "github.com/pkg/errors"
   model "{{$modelPkgPath}}"
   "{{$repoPkgPath}}"
@@ -37,13 +28,20 @@ type {{.Basic.ModLowerCamel}}Logic struct {
   repo          repo.{{.Basic.ModCamel}}Repo
   accessControl identity.AccessControl
   uuid          helpers.UUID
+  hook          hook.{{.Basic.ModCamel}}Hook
 }
 
-func New{{.Basic.ModCamel}}Logic(repo repo.{{.Basic.ModCamel}}Repo, accessControl identity.AccessControl, uuid helpers.UUID) {{.Basic.ModCamel}}Logic {
+func New{{.Basic.ModCamel}}Logic(
+  repo repo.{{.Basic.ModCamel}}Repo,
+  accessControl identity.AccessControl,
+  uuid helpers.UUID,
+  hook hook.{{.Basic.ModCamel}}Hook,
+) {{.Basic.ModCamel}}Logic {
   p := &{{.Basic.ModLowerCamel}}Logic{
     repo:          repo,
     accessControl: accessControl,
     uuid:          uuid,
+    hook:          hook,
   }
   return p
 }

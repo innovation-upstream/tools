@@ -2,4 +2,5 @@
 
 {{- $uuidHelpersPkgPath := $golangAPIModuleOptions.golang.uuidHelpersPackagePath -}}
 
-helpers "{{$uuidHelpersPkgPath}}"
+  helpers "{{$uuidHelpersPkgPath}}"
+  hook "{{ $golangAPIModuleOptions.golang.hookPackagePath }}"

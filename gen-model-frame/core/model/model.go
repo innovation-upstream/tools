@@ -6,8 +6,9 @@ import (
 
 type (
 	Model struct {
-		Label      label.ModelLabel `json:"name"`
-		FramePaths []ModelLayers    `json:"framePaths"`
-		Options    ModelOptions     `json:"options"`
+		Label      label.ModelLabel  `json:"name"`
+		FramePaths []ModelLayers     `json:"framePaths"`
+		Hooks      map[string]string `json:"hooks"`
+		Options    ModelOptions      `json:"options"`
 	}
 )
