@@ -1,6 +1,7 @@
 package check
 
 import (
+	"errors"
 	"fmt"
 	"os/exec"
 	"regexp"
@@ -24,7 +25,10 @@ func NewBazelCheck(targetScope string) Check {
 	}
 }
 
-func (c *bazelCheck) GetPotentiallyBrokenConsumers(workspaceFilePaths []string, allConsumers []string) ([]string, error) {
+func (c *bazelCheck) GetPotentiallyBrokenConsumers(
+	workspaceFilePaths []string,
+	allConsumers []string,
+) ([]string, error) {
 	var dependantBins []string
 	// TODO: extract into a func and use go routines to speed up (may need to use different bazel cache patsh to allow concurrency
 	for _, f := range workspaceFilePaths {
@@ -34,12 +38,29 @@ func (c *bazelCheck) GetPotentiallyBrokenConsumers(workspaceFilePaths []string, 
 
 		var removeFile = regexp.MustCompile(`.[^/]*$`)
 		var getBazelLabelPath = regexp.MustCompile(`^\/\/`)
+		var inTargetPath = regexp.MustCompile(c.targetScope)
 
 		path := removeFile.ReplaceAllString(f, ":all")
-		rDepsCmd := exec.Command("bazel", "query", "--output", "label", fmt.Sprintf("rdeps(%s, //%s)", c.targetScope, path))
+
+		if !inTargetPath.Match([]byte(getBazelLabelPath.ReplaceAllString(path, ""))) {
+			clog.Trace("Skipping %s", f)
+			continue
+		}
+
+		rDepsCmd := exec.Command(
+			"bazel",
+			"query",
+			"--output",
+			"label",
+			fmt.Sprintf("rdeps(%s, //%s)", c.targetScope, path),
+		)
 		rDepsOut, err := rDepsCmd.CombinedOutput()
 		if err != nil {
-			clog.Warn("warning bazel query failed with error: %+v", string(rDepsOut))
+			clog.Warn(
+				"Bazel query failed on path: %s with error: %+v",
+				path,
+				errors.New(string(rDepsOut)),
+			)
 			continue
 		}
 
