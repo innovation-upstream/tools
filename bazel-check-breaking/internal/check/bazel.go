@@ -37,12 +37,13 @@ func (c *bazelCheck) GetPotentiallyBrokenConsumers(
 		}
 
 		var removeFile = regexp.MustCompile(`.[^/]*$`)
-		var getBazelLabelPath = regexp.MustCompile(`^\/\/`)
-		var inTargetPath = regexp.MustCompile(c.targetScope)
+		var getBazelLabelPath = regexp.MustCompile(`^\/*\.?\.?`)
+		inTargetPathStr := fmt.Sprintf("^%s.*", getBazelLabelPath.ReplaceAllString(removeFile.ReplaceAllString(c.targetScope, ""), ""))
 
 		path := removeFile.ReplaceAllString(f, ":all")
 
-		if !inTargetPath.Match([]byte(getBazelLabelPath.ReplaceAllString(path, ""))) {
+		var inTargetPath = regexp.MustCompile(inTargetPathStr)
+		if !inTargetPath.MatchString(getBazelLabelPath.ReplaceAllString(path, "")) {
 			clog.Trace("Skipping %s", f)
 			continue
 		}
