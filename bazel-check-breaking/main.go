@@ -88,5 +88,5 @@ func getLogLevel(isVerbose bool) clog.Level {
 		return clog.LevelTrace
 	}
 
-	return clog.LevelWarn
+	return clog.LevelError
 }
