@@ -18,6 +18,7 @@ var removeBazelLabelName = regexp.MustCompile(`:.*$`)
 func CheckBreaking(
 	fromSHA string,
 	toSHA string,
+	bazelKind string,
 	bazelTargetScope string,
 ) ([]string, error) {
 	// Get the files we changed in to SHA commit compared to from SHA commit
@@ -36,7 +37,7 @@ func CheckBreaking(
 	bazelBinsCmd := exec.Command(
 		"bazel",
 		"query",
-		fmt.Sprintf("kind(go_binary.*, %s)", bazelTargetScope),
+		fmt.Sprintf("kind(%s.*, %s)", bazelKind, bazelTargetScope),
 		"--output",
 		"label",
 	)

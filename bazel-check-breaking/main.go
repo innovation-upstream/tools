@@ -14,6 +14,11 @@ var bazelTargetScopeFlag = flag.String(
 	"//...",
 	"specify the bazel target to use as the scope for queries",
 )
+var bazelKindFlag = flag.String(
+	"bazel-kind",
+	"go_binary",
+	"specify the kind of bazel target check for breaking changes",
+)
 var fromSHAFlag = flag.String(
 	"from-sha",
 	"",
@@ -45,6 +50,7 @@ func main() {
 	}
 	defer clog.Stop()
 
+	bazelKind := *bazelKindFlag
 	bazelTargetScope := *bazelTargetScopeFlag
 	toSHA := getStringFlag(toSHAFlag)
 	fromSHA := getStringFlag(fromSHAFlag)
@@ -54,7 +60,7 @@ func main() {
 	}
 
 	potentiallyBrokenConsumers, err :=
-		cmd.CheckBreaking(fromSHA, toSHA, bazelTargetScope)
+		cmd.CheckBreaking(fromSHA, toSHA, bazelKind, bazelTargetScope)
 	if err != nil {
 		clog.Fatal("%+v", err)
 	}

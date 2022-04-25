@@ -4,7 +4,7 @@ go_library(
     name = "cmd",
     srcs = ["check_breaking.go"],
     importpath = "gitlab.innovationup.stream/innovation-upstream/tools/bazel-check-breaking/internal/cmd",
-    visibility = ["//bazel-check-breaking:__subpackages__"],
+    visibility = ["//:__subpackages__"],
     deps = [
         "//internal/changes",
         "//internal/check",
@@ -16,5 +16,5 @@ go_library(
 alias(
     name = "go_default_library",
     actual = ":cmd",
-    visibility = ["//bazel-check-breaking:__subpackages__"],
+    visibility = ["//:__subpackages__"],
 )

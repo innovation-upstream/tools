@@ -24,7 +24,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_r
 
 go_rules_dependencies()
 
-go_register_toolchains(version = "1.16.2")
+go_register_toolchains(version = "host")
 
 load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
 
