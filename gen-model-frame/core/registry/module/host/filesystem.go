@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"innovationup.stream/tools/gen-model-frame/core/label"
-	"innovationup.stream/tools/gen-model-frame/core/registry/module/host/header"
+	"github.com/tools/gen-model-frame/core/label"
+	"github.com/tools/gen-model-frame/core/registry/module/host/header"
 )
 
 type fileSystemModuleRegistry struct {

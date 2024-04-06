@@ -5,8 +5,8 @@ import (
 	"io/ioutil"
 
 	"github.com/pkg/errors"
-	"innovationup.stream/tools/gen-model-frame/core/model"
-	"innovationup.stream/tools/gen-model-frame/input/config"
+	"github.com/tools/gen-model-frame/core/model"
+	"github.com/tools/gen-model-frame/input/config"
 )
 
 func ParseModelsFile(cfg config.ModelFrameGenConfig) ([]model.Model, error) {

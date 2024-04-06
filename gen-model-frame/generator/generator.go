@@ -2,9 +2,9 @@ package generator
 
 import (
 	"github.com/pkg/errors"
-	"innovationup.stream/tools/gen-model-frame/core/label"
-	"innovationup.stream/tools/gen-model-frame/core/model"
-	"innovationup.stream/tools/gen-model-frame/generator/renderer"
+	"github.com/tools/gen-model-frame/core/label"
+	"github.com/tools/gen-model-frame/core/model"
+	"github.com/tools/gen-model-frame/generator/renderer"
 )
 
 type (

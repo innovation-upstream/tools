@@ -3,9 +3,9 @@ package target
 import (
 	"strings"
 
-	"innovationup.stream/tools/gen-model-frame/core/label"
-	"innovationup.stream/tools/gen-model-frame/core/module"
-	"innovationup.stream/tools/gen-model-frame/input/config"
+	"github.com/tools/gen-model-frame/core/label"
+	"github.com/tools/gen-model-frame/core/module"
+	"github.com/tools/gen-model-frame/input/config"
 )
 
 type (

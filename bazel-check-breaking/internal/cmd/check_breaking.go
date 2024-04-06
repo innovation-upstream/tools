@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"gitlab.innovationup.stream/innovation-upstream/tools/bazel-check-breaking/internal/changes"
-	"gitlab.innovationup.stream/innovation-upstream/tools/bazel-check-breaking/internal/check"
+	"github.com/innovation-upstream/tools/bazel-check-breaking/internal/changes"
+	"github.com/innovation-upstream/tools/bazel-check-breaking/internal/check"
 	"unknwon.dev/clog/v2"
 )
 

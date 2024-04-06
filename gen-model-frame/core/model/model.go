@@ -1,7 +1,7 @@
 package model
 
 import (
-	"innovationup.stream/tools/gen-model-frame/core/label"
+	"github.com/tools/gen-model-frame/core/label"
 )
 
 type (

@@ -1,8 +1,8 @@
 package renderer
 
 import (
-	"innovationup.stream/tools/gen-model-frame/core/label"
-	"innovationup.stream/tools/gen-model-frame/core/model"
+	"github.com/tools/gen-model-frame/core/label"
+	"github.com/tools/gen-model-frame/core/model"
 )
 
 type RenderedModelLayers map[label.ModelFrameResourceLabel]string

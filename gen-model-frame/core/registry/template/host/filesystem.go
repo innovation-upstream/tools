@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"innovationup.stream/tools/gen-model-frame/core/label"
+	"github.com/tools/gen-model-frame/core/label"
 	"unknwon.dev/clog/v2"
 )
 

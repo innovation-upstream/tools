@@ -2,8 +2,8 @@ package config
 
 import (
 	"github.com/iancoleman/strcase"
-	"innovationup.stream/tools/gen-model-frame/core/label"
-	"innovationup.stream/tools/gen-model-frame/core/regexp"
+	"github.com/tools/gen-model-frame/core/label"
+	"github.com/tools/gen-model-frame/core/regexp"
 	"unknwon.dev/clog/v2"
 )
 

@@ -1,6 +1,6 @@
 package template
 
-import "innovationup.stream/tools/gen-model-frame/core/label"
+import "github.com/tools/gen-model-frame/core/label"
 
 type (
 	ModuleTemplates struct {

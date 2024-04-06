@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"gitlab.innovationup.stream/innovation-upstream/tools/bazel-check-breaking/internal/cmd"
+	"github.com/innovation-upstream/tools/bazel-check-breaking/internal/cmd"
 	"unknwon.dev/clog/v2"
 )
 

@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	gmfRegexp "innovationup.stream/tools/gen-model-frame/core/regexp"
+	gmfRegexp "github.com/tools/gen-model-frame/core/regexp"
 )
 
 type (

@@ -8,10 +8,10 @@ import (
 
 	"github.com/Masterminds/sprig"
 	"github.com/pkg/errors"
-	"innovationup.stream/tools/gen-model-frame/core/label"
-	"innovationup.stream/tools/gen-model-frame/core/model"
-	moduleTmpl "innovationup.stream/tools/gen-model-frame/core/template"
-	"innovationup.stream/tools/gen-model-frame/generator/renderer"
+	"github.com/tools/gen-model-frame/core/label"
+	"github.com/tools/gen-model-frame/core/model"
+	moduleTmpl "github.com/tools/gen-model-frame/core/template"
+	"github.com/tools/gen-model-frame/generator/renderer"
 )
 
 type goTemplateModelLayerRenderer struct {

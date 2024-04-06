@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"innovationup.stream/tools/gen-model-frame/core/label"
-	"innovationup.stream/tools/gen-model-frame/core/module"
-	registry "innovationup.stream/tools/gen-model-frame/core/registry/module/host"
+	"github.com/tools/gen-model-frame/core/label"
+	"github.com/tools/gen-model-frame/core/module"
+	registry "github.com/tools/gen-model-frame/core/registry/module/host"
 )
 
 type (

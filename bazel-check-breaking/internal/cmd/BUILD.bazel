@@ -3,7 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "cmd",
     srcs = ["check_breaking.go"],
-    importpath = "gitlab.innovationup.stream/innovation-upstream/tools/bazel-check-breaking/internal/cmd",
+    importpath = "github.com/innovation-upstream/tools/bazel-check-breaking/internal/cmd",
     visibility = ["//:__subpackages__"],
     deps = [
         "//internal/changes",

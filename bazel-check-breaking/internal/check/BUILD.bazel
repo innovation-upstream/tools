@@ -6,7 +6,7 @@ go_library(
         "bazel.go",
         "check.go",
     ],
-    importpath = "gitlab.innovationup.stream/innovation-upstream/tools/bazel-check-breaking/internal/check",
+    importpath = "github.com/innovation-upstream/tools/bazel-check-breaking/internal/check",
     visibility = ["//bazel-check-breaking:__subpackages__"],
     deps = ["@dev_unknwon_clog_v2//:go_default_library"],
 )

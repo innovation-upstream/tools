@@ -1,6 +1,6 @@
 package renderer
 
-import "innovationup.stream/tools/gen-model-frame/core/model"
+import "github.com/tools/gen-model-frame/core/model"
 
 type (
 	BasicTemplateInput struct {

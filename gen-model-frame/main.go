@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/pkg/errors"
-	"innovationup.stream/tools/gen-model-frame/input/filesystem"
+	"github.com/tools/gen-model-frame/input/filesystem"
 	clog "unknwon.dev/clog/v2"
 )
 

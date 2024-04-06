@@ -2,7 +2,7 @@ package renderer
 
 import (
 	"github.com/iancoleman/strcase"
-	"innovationup.stream/tools/gen-model-frame/core/model"
+	"github.com/tools/gen-model-frame/core/model"
 )
 
 type (

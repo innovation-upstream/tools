@@ -2,10 +2,10 @@ package analyze
 
 import (
 	"github.com/pkg/errors"
-	"innovationup.stream/tools/gen-model-frame/core/label"
-	"innovationup.stream/tools/gen-model-frame/core/model"
-	"innovationup.stream/tools/gen-model-frame/core/module"
-	moduleRegistryClient "innovationup.stream/tools/gen-model-frame/core/registry/module/client"
+	"github.com/tools/gen-model-frame/core/label"
+	"github.com/tools/gen-model-frame/core/model"
+	"github.com/tools/gen-model-frame/core/module"
+	moduleRegistryClient "github.com/tools/gen-model-frame/core/registry/module/client"
 )
 
 type (

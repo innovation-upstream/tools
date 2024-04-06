@@ -1,4 +1,4 @@
-module gitlab.innovationup.stream/innovation-upstream/tools/bazel-check-breaking
+module github.com/innovation-upstream/tools/bazel-check-breaking
 
 go 1.17
 

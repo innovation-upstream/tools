@@ -2,11 +2,11 @@ package client
 
 import (
 	"github.com/pkg/errors"
-	"innovationup.stream/tools/gen-model-frame/core/label"
-	"innovationup.stream/tools/gen-model-frame/core/model"
-	"innovationup.stream/tools/gen-model-frame/core/module"
-	host "innovationup.stream/tools/gen-model-frame/core/registry/template/host"
-	"innovationup.stream/tools/gen-model-frame/core/template"
+	"github.com/tools/gen-model-frame/core/label"
+	"github.com/tools/gen-model-frame/core/model"
+	"github.com/tools/gen-model-frame/core/module"
+	host "github.com/tools/gen-model-frame/core/registry/template/host"
+	"github.com/tools/gen-model-frame/core/template"
 	"unknwon.dev/clog/v2"
 )
 

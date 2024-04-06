@@ -6,7 +6,7 @@ go_library(
         "changes.go",
         "git.go",
     ],
-    importpath = "gitlab.innovationup.stream/innovation-upstream/tools/bazel-check-breaking/internal/changes",
+    importpath = "github.com/innovation-upstream/tools/bazel-check-breaking/internal/changes",
     visibility = ["//:__subpackages__"],
     deps = ["@com_github_pkg_errors//:go_default_library"],
 )

@@ -1,7 +1,7 @@
 package model
 
 import (
-	"innovationup.stream/tools/gen-model-frame/core/module"
+	"github.com/tools/gen-model-frame/core/module"
 )
 
 // Represent a collection of model frames and how they relate/interact with
